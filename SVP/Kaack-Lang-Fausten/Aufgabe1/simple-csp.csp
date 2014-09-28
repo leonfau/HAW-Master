@@ -17,3 +17,25 @@ SYS2 = P [] Q
 SYS3 = P |~| Q
 SYS4 = P [] R
 SYS5 = P |~| R
+
+--------------------------------------------------------------
+-- Erarbeiten Sie die Traces der einzelnen und zusammengesetzten Prozesse 
+-- und demonstrieren Sie das Ergebnis und ihre Beobachtungen während des Übungstermins.
+-- Insbesondere: welche Unterschiede in der Prozessspezifikation ergeben
+-- welche Anderung des Verhaltens?
+--------------------------------------------------------------
+--------------------------------------------------------------
+-- SYS1
+-- <>; <a>; <a,b>; <a,c>; <c>; <c,d>; <c,d,c>; <c,d,c,d>; <c,d, ...>
+-------
+-- SYS2
+-- <>; <a>; <a,b>; <a,c>
+-------
+-- SYS3 
+-- <>; <a>; <a,b>; <a,c>
+-------
+-- SYS4 
+-- <>; <a>; <a,b>; <c>; <c,d>; <c,d,c>; <c,d,c,d>; <c,d, ...>
+-------
+-- SYS5
+-- <>; <a>; <a,b>; <c>; <c,d>; <c,d,c>; <c,d,c,d>; <c,d, ...>
