@@ -5,24 +5,15 @@
 ---------------------------------------------------------------
 
 --------------------------------------------------------------
---  Legen Sie eine CSP M Datei namens simple-csp.csp an für die Teilprozese P , Q, R und den
---  CSP-Prozess SYS
---  P = a → b → Skip
---  Q = a → c → Stop
---  R = c → d → R
---  SYS 1 = (P ✷ Q) R
---  SYS 2 = P ✷ Q
---  SYS 3 = P Q
---  SYS 4 = P ✷ R
---  SYS 4 = P R
-
---  Erarbeiten Sie die Traces der einzelnen und zusammengesetzten Prozesse und demonstrieren Sie
---  das Ergebnis und ihre Beobachtungen während des Übungstermins.
---  Insbesondere: welche Unterschiede in der Prozessspezifikation ergeben welche Anderung des Verhaltens?
+--  Aufgabe 1.1 Prozesse erkunden
 --------------------------------------------------------------
+channel a,b,c,d
 
-
-
-
-
-
+P = a -> b -> SKIP
+Q = a -> c -> STOP
+R = c -> d -> R
+SYS1 = (P [] Q) |~| R
+SYS2 = P [] Q
+SYS3 = P |~| Q
+SYS4 = P [] R
+SYS5 = P |~| R
