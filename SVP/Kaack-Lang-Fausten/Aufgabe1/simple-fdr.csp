@@ -13,10 +13,11 @@ channel a, b, c, d, f
 -- Gegeben seien die folgenden Basisprozesse:
 --------------------------------------------------------------
 P = a -> b -> c -> SKIP
-Q = a -> ((c -> d -> SKIP) [] (b -> f -> Skip))
+Q = a -> ((c -> d -> SKIP) [] (b -> f -> SKIP))
 
 --------------------------------------------------------------
--- Schreiben Sie CSP M Prozesse für die Basisprozesse sowie die darauf aufbauenden Prozesse S1 bis S5, die von FDR syntaktisch akzeptiert werden
+-- Schreiben Sie CSP M Prozesse für die Basisprozesse sowie die darauf 
+-- aufbauenden Prozesse S1 bis S5, die von FDR syntaktisch akzeptiert werden
 --------------------------------------------------------------
 
 -- a) -- sequential composition
@@ -28,17 +29,25 @@ S1 = P ; Q
 S2 = P [|{a,b}|] Q  	
 
 -- c) -- interleaving
--- Prozesse P und Q laufen unabhängig voneinander, keine Gegenseitige Beeinflussung, können paralllel Ausgeführt werden
+-- Prozesse P und Q laufen unabhängig voneinander, keine Gegenseitige Beeinflussung, 
+-- können parallel Ausgeführt werden
 S3 = P ||| Q 			
 
 -- d) -- external choice
--- Deterministische Auswahl, durch ein nicht weiter spezifiziertes Ereigniss, ob Prozess P oder Q ausgeführt wird
+-- Deterministische Auswahl, durch ein nicht weiter spezifiziertes Ereigniss, 
+-- ob Prozess P oder Q ausgeführt wird
 S4 = P [] Q				
  
 -- e) -- interrupt
--- Prozess P wird solange ausgeführt, bis er von Q unterbrochen wird. Bei Terminierung von P vor dem start von Q terminiert gesamter Prozess. Q wird gestartet sobal eines von Q sichtbaren Ereignissen auftritt.
+-- Prozess P wird solange ausgeführt, bis er von Q unterbrochen wird. 
+-- Bei Terminierung von P vor dem start von Q terminiert gesamter Prozess. 
+-- Q wird gestartet sobal eines von Q sichtbaren Ereignissen auftritt.
 S5 = P /\ Q 			
 
-
-
-
+--------------------------------------------------------------
+-- Prüfen Sie mit Hilfe der FDR2-Trace-Refinement-Beziehung [T= (trace refinement),
+-- welche der Sx-Prozesse Verfeinerungen von einander sind.
+-- Dazu sollen die erforderlichen checks direkt in der CSP-Datei
+-- spezifiziert werden in der Form assertX[T = Y ;
+--------------------------------------------------------------
+assert S1 :[deadlock free [F]]
