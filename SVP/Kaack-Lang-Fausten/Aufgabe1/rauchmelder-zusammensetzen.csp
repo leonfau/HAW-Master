@@ -33,8 +33,6 @@ MELDER = check!0 -> check!1 -> MELDER_ALARM_SUB
 --System-Deklaration -- zu ergänzen
 --===================================================
 SYNC = {|check, smoke, no_smoke, reset|}
-M1 = MELDER [|SYNC|] SENSOR(0)
-M2 = MELDER [|SYNC|] SENSOR(1)
 SYS = (SENSOR(0) ||| SENSOR(1)) [|SYNC|] MELDER
 
 --===================================================
