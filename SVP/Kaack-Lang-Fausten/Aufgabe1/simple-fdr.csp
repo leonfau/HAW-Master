@@ -50,8 +50,30 @@ S5 = P /\ Q
 -- Dazu sollen die erforderlichen checks direkt in der CSP-Datei
 -- spezifiziert werden in der Form assertX[T = Y ;
 --------------------------------------------------------------
-assert S3[T= S1
-assert S5[T= S1
-assert S5[T= S4
+assert S1[T= S2  -- Nein --> <a,c>
+assert S1[T= S3  -- Nein --> <a,a>
+assert S1[T= S4  -- Nein --> <a,c>
+assert S1[T= S5  -- Nein --> <a,a>
+
+assert S2[T= S1  -- Neim --> <a,b,c,a>
+assert S2[T= S3  -- Nein --> <a,a>
+assert S2[T= S4  -- Nein --> <a,c,d> , S2 steck fest
+assert S2[T= S5  -- Nein --> <a,a>
+
+assert S3[T= S1  -- Ja
+assert S3[T= S2  -- Nein --> <a,a>
+assert S3[T= S4  -- Nein --> <a,b,c,f>
+assert S3[T= S5  -- Nein --> <a,b,c,a>
+
+assert S4[T= S1  -- Nein --> <a,b,c,a>
+assert S4[T= S2  -- Nein --> <a,b,c,f>
+assert S4[T= S3  -- Nein --> <a,a>
+assert S4[T= S5  -- Nein --> <a,a>
+
+assert S5[T= S1  -- Ja
+assert S5[T= S2  -- Nein --> <a,b,f,c>
+assert S5[T= S3  -- Nein --> <a,c,a>
+assert S5[T= S4  -- Ja
+
 
 
