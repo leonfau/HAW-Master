@@ -50,3 +50,8 @@ S5 = P /\ Q
 -- Dazu sollen die erforderlichen checks direkt in der CSP-Datei
 -- spezifiziert werden in der Form assertX[T = Y ;
 --------------------------------------------------------------
+assert S3[T= S1
+assert S5[T= S1
+assert S5[T= S4
+
+
