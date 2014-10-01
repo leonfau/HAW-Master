@@ -2,7 +2,8 @@ nametype SId = {0,1}
 
 --===================================================
 -- Channel-Deklarationen zum Ergänzen (1 oder mehrere Deklarationszeilen)
-channel reset, check, smoke, no_smoke, ack, 
+channel reset, check, smoke, no_smoke :SId
+channel ack, alarm
 --===================================================
 
 
@@ -31,14 +32,16 @@ MELDER = check!0 -> check!1 -> MELDER_ALARM_SUB
 --===================================================
 --System-Deklaration -- zu ergänzen
 --===================================================
-
-SYS = 
+SYNC = {|check, smoke, no_smoke, reset|}
+M1 = MELDER [|SYNC|] SENSOR(0)
+M2 = MELDER [|SYNC|] SENSOR(1)
+SYS = (SENSOR(0) ||| SENSOR(1)) [|SYNC|] MELDER
 
 --===================================================
 
 
 
---Spezifikation (WENN genau zwei smoke empfangen, dann auch Alarm auslösen)
+--Spezifikation (WENN genau zwei smoke empfangen, dann auch Alarm ausloesen)
 
 CHECK_MELDER = RCV_SMOKES ; alarm -> ack -> CHECK_MELDER
 
