@@ -1,0 +1,234 @@
+---------------------------------------------------------------
+--
+--  Konkurrierender Zugriff auf gemeinsamen Speicher
+--  fuer das Reader/Writer-Problem:
+--  Implementierung mit Ringpuffer-Technik
+--
+--  jp 11NOV2001
+---------------------------------------------------------------
+
+--------------------------------------------------------------
+-- Darstellung erfolgt TOP-DOWN --- zunaechst das
+-- ABSTRAKTE SYSTEM 'ASYS', welches spaeter durch das KONKRETE SYSTEM
+-- 'CSYS' verfeinert werden soll
+--------------------------------------------------------------
+
+ASYS = (READ_ABS ||| WRITE_ABS)
+       [| {| rd,wr |} |]
+       BUF
+
+
+---------------------------------------------------------------
+-- Abstrakte Spezifikation:
+-- Ein FiFo-Puffer mit Kapazitaet max
+---------------------------------------------------------------
+
+
+DATA = { 0..2 }     
+
+max = 2
+
+channel rd :DATA -- zum Lesen aus dem Puffer
+channel wr :DATA -- zum Schreiben in den Puffer
+
+-- In CSP koennen Sequenzen als Datenstrukturen
+-- in Prozessparametern verwendet werden:
+-- <e1,...,en>. <> ist die leere Sequenz.
+-- s^u ist die Konkatenation von s und u
+-- head(s) und tail(s) definiert wie gewohnt.
+-- #s ist die Laenge der Sequenz.
+
+BUF = B(<>)
+
+B(s) = (#s > 0)&rd!head(s) -> B(tail(s))
+       []
+       (#s < max)&wr?x -> B(s^<x>)
+
+
+-----------------------------------------------------------------
+-- Abstrakte Spezifikation des Readers
+-----------------------------------------------------------------
+
+channel process_rd  -- abstraktes Ereignis: verarbeite die gelesenen Daten
+
+
+READ_ABS = rd?x -> process_rd -> READ_ABS
+
+
+
+-----------------------------------------------------------------
+-- Abstrakte Spezifikation des Writers:
+-----------------------------------------------------------------
+
+-- Writer produziert nicht-deterministisch irgendein x aus DATA
+-- |~| ist die nicht-deterministische Auswahl (internal choice)
+WRITE_ABS = (|~| x:DATA @ WRABS(x))
+
+WRABS(x)  = wr!x -> WRITE_ABS
+
+
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+--  KONKRETES SYSTEMrd CSYS
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+SYS_CON = (READ_INDEX(0) ||| WRITE_INDEX(0))
+	  [|{| rd_ri, rd_wi, wr_ri, wr_wi |}|]
+	  (WRITE_CON ||| READ_CON)
+
+
+-----------------------------------------------------------------
+-- Aufbau des Ringpuffers
+--
+-- Fuer die unten spezifizierte Implementierung benoetigt
+-- man einen Array der Laenge max+1, um einen FIFO-Puffer
+-- der Kapzität max zu realisieren.
+-----------------------------------------------------------------
+
+
+--
+-- Read-index
+--
+channel rd_ri : { 0..max } -- Kanal zum Lesen des Read-Index
+channel wr_ri : { 0..max } -- Kanal zum Schreiben auf den Read-Index
+
+READ_INDEX(i) = 
+	      rd_ri!i -> WRITE_INDEX(i)
+	      []
+	      wr_ri?x -> READ_INDEX(x)
+
+--
+-- Write-Index
+-- 
+channel rd_wi : { 0..max } -- Kanal zum Lesen des Write-Index
+channel wr_wi : { 0..max } -- Kanal zum Schreiben auf den Write-Index 
+
+WRITE_INDEX(i) =
+	      rd_wi!i -> WRITE_INDEX(i)
+	      []
+	      wr_wi?x -> WRITE_INDEX(x)
+
+
+--
+-- der Puffer selbst (Ein Array von 0..max)
+-- Jede Zelle des Arrays ist ein Prozess B(i,x): i ist der
+-- Index, an dem die Zelle steht, x der aktuelle Wert der Zelle.
+--
+
+channel crd : { 0..max }.DATA -- Read Channels des konkreten Puffers
+channel cwr : { 0..max }.DATA -- Write Channels des konkreten Puffers
+
+CBUF = (||| i:{ 0..max } @ CB(i,0))
+
+CB(i,x) = crd.i!x -> CB(i,x)
+          []
+          cwr.i?y -> CB(i,y)  
+
+
+
+
+
+
+
+----------------------------------------------------------------
+-- Konkrete Spec des Readers
+-- Lies Read/write Index. Falls =, ist nichts im Puffer.
+-- Falls ungleich, lies vom aktuellen Read-Index 
+-- und inkrementiere
+-- ihn danach. Inkrementierung muss modulo Puffergroesse (max+1)
+-- erfolgen.
+----------------------------------------------------------------
+
+READ_CON = 
+	 rd_ri?x -> rd_wi?y ->
+	 if (x ==y)
+	 then READ_CON
+	 else 
+	  crd.x?z -> wr_ri!((x+1)%(max+1)) -> READ_CON
+
+----------------------------------------------------------------
+-- Konkrete Spec des Writers:
+-- Lies Read/write Index. Falls 
+-- (WriteIndex+1)%Puffergroesse = ReadIndex,
+-- ist der Puffer voll, und es darf erst wieder
+-- geschrieben werden,
+-- wenn diese Situation nicht mehr vorliegt. Falls
+-- (WriteIndex+1)%Puffergroesse != ReadIndex, wird an die
+-- aktuelle Position des WriteIndex geschrieben und DANACH der
+-- WriteIndex erhoeht.
+----------------------------------------------------------------
+
+
+WRITE_CON =  [] d: DATA @ WR_CON(d)
+
+WR_CON(d) = 
+	 rd_ri?x -> rd_wi?y ->
+	 let wi = (y+1)%max
+	 within
+		if (x == wi)
+	 	then WRITE_CON
+	 	else
+		cwr.y!d -> wr_wi!wi -> WRITE_CON
+
+
+----------------------------------------------------------------
+-- fuer die Refinement-Bedingung wird 
+-- jeder crd.i.x-event mit dem abstrakten rd.x
+-- und jeder cwr.i-event mit dem abstrakten wr.x identifiziert.
+----------------------------------------------------------------
+
+SYS_CON_IDENT = 
+   SYS_CON[[ crd.i <- rd, cwr.i <- wr | i <- {0..max} ]] 
+
+
+
+
+----------------------------------------------------------------
+-- das abstrakte system muss mit CHAOS(M) verschraenkt werden,
+-- wobei M alle Events enthaelt, 
+-- die nur in der Implementierung vorkommen
+----------------------------------------------------------------
+
+M = {|rd_ri,rd_wi,wr_ri,wr_wi|}
+
+ASYS_CHAOS = ASYS ||| CHAOS(M)
+
+
+---------------------------------------------------------------
+-- Erste Verifikationsbedingung:
+-- Jede Folge von wr.x/rd.y-Ereignissen, 
+-- die das konkrete System SYS_CON_IDENT
+-- erzeugen kann, ist auch im abstrakten System legal
+---------------------------------------------------------------
+
+assert ASYS_CHAOS [T= SYS_CON_IDENT
+
+
+
+---------------------------------------------------------------
+-- Zweite Verifikationsbedingung:
+-- Jede Folge von wr.x/rd.y-Ereignissen, 
+-- die das abstrakte System 
+-- ASYS erzeugen kann, ist auch im konkreten  System legal.
+-- Hierzu muss man die zusaetzlich fuer die Implementierung
+-- eingefuehrten Ereignisse in SYS ausblenden. Dies ergibt
+-- die Prozessdefinition SYS_CON_H.
+--------------------------------------------------------------
+
+SYS_CON_H = SYS_CON_IDENT \ M
+
+assert SYS_CON_H [T= ASYS
+
+---- sanity checks
+
+SIMPLE = wr.0 -> wr.1 -> rd.0 -> wr.1 -> STOP
+
+assert SYS_CON_H [T= SIMPLE
+
+
+
+
+
+
