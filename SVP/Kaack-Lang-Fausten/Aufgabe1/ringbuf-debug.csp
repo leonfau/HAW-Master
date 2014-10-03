@@ -219,7 +219,7 @@ assert ASYS_CHAOS [T= SYS_CON_IDENT
 
 SYS_CON_H = SYS_CON_IDENT \ M
 
-assert SYS_CON_H [T= ASYS
+assert ASYS [T= SYS_CON_H
 
 ---- sanity checks
 
