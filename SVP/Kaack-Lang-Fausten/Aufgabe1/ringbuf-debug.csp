@@ -15,7 +15,7 @@
 
 ASYS = (READ_ABS ||| WRITE_ABS)
        [| {| rd,wr |} |]
-       BUF
+       BUF \ {|process_rd|}
 
 
 ---------------------------------------------------------------
@@ -76,7 +76,7 @@ WRABS(x)  = wr!x -> WRITE_ABS
 
 SYS_CON = (READ_INDEX(0) ||| WRITE_INDEX(0))
 	  [|{| rd_ri, rd_wi, wr_ri, wr_wi |}|]
-	  (WRITE_CON ||| READ_CON)
+	  ((WRITE_CON ||| READ_CON) [| {|crd, cwr|} |] CBUF)
 
 
 -----------------------------------------------------------------
@@ -95,7 +95,7 @@ channel rd_ri : { 0..max } -- Kanal zum Lesen des Read-Index
 channel wr_ri : { 0..max } -- Kanal zum Schreiben auf den Read-Index
 
 READ_INDEX(i) = 
-	      rd_ri!i -> WRITE_INDEX(i)
+	      rd_ri!i -> READ_INDEX(i)
 	      []
 	      wr_ri?x -> READ_INDEX(x)
 
@@ -165,7 +165,7 @@ WRITE_CON =  [] d: DATA @ WR_CON(d)
 
 WR_CON(d) = 
 	 rd_ri?x -> rd_wi?y ->
-	 let wi = (y+1)%max
+		 let wi = (y+1)%(max+1)
 	 within
 		if (x == wi)
 	 	then WRITE_CON
@@ -219,7 +219,8 @@ assert ASYS_CHAOS [T= SYS_CON_IDENT
 
 SYS_CON_H = SYS_CON_IDENT \ M
 
-assert ASYS [T= SYS_CON_H
+
+assert SYS_CON_H [T= ASYS
 
 ---- sanity checks
 
