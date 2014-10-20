@@ -1,0 +1,48 @@
+-- Spezifikation Schrankensystem mit Prüfungen
+-- Übung TH2, WS 11/12
+
+------------
+--Datentypen 
+------------ 
+
+ nametype ZId = {0,1,2,3}  
+ nametype SegId = {"l1","l2","r1","r2"} -- links 1 und 2, rechts 1 und 2 
+ nametype SigStates = {"r", "g"} -- Signalzustand rot, grün 
+ nametype SegState = {"unten", "oben", "senken", "heben" }-- Segmentzustand 
+ channel zug_kommt, zug_rein, zug_raus: ZId 
+ channel df_anfrage, df_freigabe: ZId  -- Durchfahrt Anfrage und Freigabe 
+ channel seg_senken, seg_heben, seg_unten, seg_oben: SegId
+
+------------
+--Basisprozesse
+------------ 
+
+channel seg_state: SegId.SegState
+
+SEGMENT (id) = seg_oben.id -> seg_senken.id -> seg_unten.id -> seg_heben.id -> 
+			(SEGMENT(id) [] (seg_senken.id -> seg_unten.id -> SEGMENT(id)))
+
+					
+STEUER ( ) = df_anfrage?zid  -> seg_senken!"r1" -> seg_senken!"r2" -> seg_senken!"l1" -> seg_senken!"l2" -> df_freigabe?zid -> zug_rein!zid -> STEUER()
+
+channel sig_state: SigStates
+SIGNAL (state) = (sig_state.state -> SIGNAL(state))
+				[]
+				(sig_state?x -> SIGNAL(x))
+
+ZUG (zid) = zug_kommt.zid -> df_anfrage.zid -> df_freigabe.zid -> zug_rein.zid -> zug_raus.zid -> ZUG(zid)
+
+------------
+--Gesamtsystem
+------------ 
+A = {|df_anfrage, df_freigabe, zug_rein|}
+--SYS = STEUER [|A|] ZUG(1)
+
+------------
+--Prüfungen
+------------ 
+
+-- Zug fährt nur wenn alle Schranken unten sind
+
+
+-- Kein Zug ist dauerhaft blockiert

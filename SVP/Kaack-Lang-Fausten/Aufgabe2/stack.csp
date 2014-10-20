@@ -1,0 +1,14 @@
+max = 3
+nametype Data = {1..2}
+channel push, pop: Data
+STACK1 = push?d -> pop!d -> STACK1
+STACK3(<>) = push?d -> STACK3(<d>)
+STACK3(<h>^s) =
+	pop!h -> STACK3(s)
+	[]
+	(#s < (max-1)) & push?d -> STACK3(<d>^<h>^s)
+
+assert STACK1 [T= STACK3(<>)
+assert STACK3(<>) [T= STACK1
+assert STACK1 [F= STACK3(<>)
+assert STACK3(<>) [F= STACK1
