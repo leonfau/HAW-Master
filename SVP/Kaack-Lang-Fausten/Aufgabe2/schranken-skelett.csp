@@ -21,14 +21,18 @@ channel seg_state: SegId.SegState
 
 SEGMENT (id) = seg_oben.id -> seg_senken.id -> seg_unten.id -> seg_heben.id -> 
 			(SEGMENT(id) [] (seg_senken.id -> seg_unten.id -> SEGMENT(id)))
+			
+SEG_SENKEN_R() = seg_senken!"r1" || seg_senken!"r2"
 
 					
-STEUER ( ) = df_anfrage?zid  -> seg_senken!"r1" -> seg_senken!"r2" -> seg_senken!"l1" -> seg_senken!"l2" -> df_freigabe?zid -> zug_rein!zid -> STEUER()
+STEUER ( ) = df_anfrage?zid  -> seg_senken!"r1" -> seg_senken!"r2" -> seg_senken!"l1" -> seg_senken!"l2" -> df_freigabe?zid -> zug_rein!zid -> zug_rein!zid -> STEUER()
 
 channel sig_state: SigStates
-SIGNAL (state) = (sig_state.state -> SIGNAL(state))
+SIGNAL_ALt (state) = (sig_state!state -> SIGNAL(state))
 				[]
 				(sig_state?x -> SIGNAL(x))
+
+SIGNAL() = zug_kommt.id -> sig_state."r" ->seg_state."unten"
 
 ZUG (zid) = zug_kommt.zid -> df_anfrage.zid -> df_freigabe.zid -> zug_rein.zid -> zug_raus.zid -> ZUG(zid)
 

@@ -15,7 +15,7 @@
 
 ASYS = (READ_ABS ||| WRITE_ABS)
        [| {| rd,wr |} |]
-       BUF \ {|process_rd|}
+       BUF \ {|process_rd|}    							-- Fehler 1
 
 
 ---------------------------------------------------------------
@@ -28,8 +28,8 @@ DATA = { 0..2 }
 
 max = 2
 
-channel rd :DATA -- zum Lesen aus dem Puffer
-channel wr :DATA -- zum Schreiben in den Puffer
+channel rd :DATA -- zum Lesen aus dem Puffer			-- Fehler2
+channel wr :DATA -- zum Schreiben in den Puffer			-- Fehler2
 
 -- In CSP koennen Sequenzen als Datenstrukturen
 -- in Prozessparametern verwendet werden:
@@ -74,9 +74,9 @@ WRABS(x)  = wr!x -> WRITE_ABS
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
-SYS_CON = (READ_INDEX(0) ||| WRITE_INDEX(0))
-	  [|{| rd_ri, rd_wi, wr_ri, wr_wi |}|]
-	  ((WRITE_CON ||| READ_CON) [| {|crd, cwr|} |] CBUF)
+SYS_CON = (READ_INDEX(0) ||| WRITE_INDEX(0)) 			-- Fehler 3
+	  [|{| rd_ri, rd_wi, wr_ri, wr_wi |}|]				-- Fehler 4
+	  ((WRITE_CON ||| READ_CON) [| {|crd, cwr|} |] CBUF)-- Fehler 5
 
 
 -----------------------------------------------------------------
@@ -95,9 +95,9 @@ channel rd_ri : { 0..max } -- Kanal zum Lesen des Read-Index
 channel wr_ri : { 0..max } -- Kanal zum Schreiben auf den Read-Index
 
 READ_INDEX(i) = 
-	      rd_ri!i -> READ_INDEX(i)
+	      rd_ri!i -> READ_INDEX(i)						-- Fehler 6
 	      []
-	      wr_ri?x -> READ_INDEX(x)
+	      wr_ri?x -> READ_INDEX(x)						-- Fehler 7
 
 --
 -- Write-Index
@@ -142,8 +142,8 @@ CB(i,x) = crd.i!x -> CB(i,x)
 ----------------------------------------------------------------
 
 READ_CON = 
-	 rd_ri?x -> rd_wi?y ->
-	 if (x ==y)
+	 rd_ri?x -> rd_wi?y ->								-- Fehler 8
+	 if (x ==y)											-- Fehler 9
 	 then READ_CON
 	 else 
 	  crd.x?z -> wr_ri!((x+1)%(max+1)) -> READ_CON
@@ -165,12 +165,12 @@ WRITE_CON =  [] d: DATA @ WR_CON(d)
 
 WR_CON(d) = 
 	 rd_ri?x -> rd_wi?y ->
-		 let wi = (y+1)%(max+1)
+		 let wi = (y+1)%(max+1)							-- Fehler 10
 	 within
-		if (x == wi)
+		if (x == wi)									-- Fehler 11
 	 	then WRITE_CON
 	 	else
-		cwr.y!d -> wr_wi!wi -> WRITE_CON
+		cwr.y!d -> wr_wi!wi -> WRITE_CON				-- Fehler 12
 
 
 ----------------------------------------------------------------
@@ -191,7 +191,7 @@ SYS_CON_IDENT =
 -- die nur in der Implementierung vorkommen
 ----------------------------------------------------------------
 
-M = {|rd_ri,rd_wi,wr_ri,wr_wi|}
+M = {|rd_ri,rd_wi,wr_ri,wr_wi|}							-- Fehler 13
 
 ASYS_CHAOS = ASYS ||| CHAOS(M)
 
