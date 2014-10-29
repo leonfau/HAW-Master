@@ -51,12 +51,12 @@ SIGNAL (state) = (df_freigabe?zid -> SIGNAL(g))
 
 ZUG (zid) = zug_kommt!zid -> df_anfrage!zid -> df_freigabe?zid -> zug_rein!zid -> zug_raus!zid -> ZUG(zid)
 
-------------
+-----------
 --Gesamtsystem
 ------------ 
-A = {|df_anfrage, df_freigabe, zug_rein|}
---SYS = STEUER [|A|] ZUG(1)
-
+SEG_INIT = SEGMENT(l1,oben) ||| SEGMENT(l2,unten) ||| SEGMENT(r1,oben) ||| SEGMENT(r2,oben)
+ZUG_INIT = ZUG(0) ||| ZUG(1) ||| ZUG(2) ||| ZUG(3)
+SYS = ((ZUG_INIT [|{|df_anfrage, df_freigabe, zug_raus|}|] STEUER()) [|{|df_freigabe, zug_rein|}|] SIGNAL(r)) [|{| seg_senken, seg_heben, seg_unten|}|] SEG_INIT
 ------------
 --Prüfungen
 ------------ 
