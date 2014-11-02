@@ -29,39 +29,53 @@ SEGMENT (id, status) = (status ==oben & seg_senken?id -> SEGMENT(id, senken))
 					   
 			
 SENKEN() = seg_senken!l1 -> seg_senken!l2 -> 
-					((seg_unten?l1 -> seg_unten?l2 -> SENKEN_RECHTS()) 
+					((seg_unten.l1 -> seg_unten.l2 -> SENKEN_RECHTS()) 
 					[] 
-					(seg_unten?l2 -> seg_unten?l1-> SENKEN_RECHTS()))
+					(seg_unten.l2 -> seg_unten.l1-> SENKEN_RECHTS()))
 	
 SENKEN_RECHTS() = seg_senken!r1 -> seg_senken!r2 -> 
-					((seg_unten?r1 -> seg_unten?r2 -> SKIP) 
+					((seg_unten.r1 -> seg_unten.r2 -> SKIP) 
 					[] 
-					(seg_unten?r2 -> seg_unten?r1-> SKIP))
+					(seg_unten.r2 -> seg_unten.r1-> SKIP))
 					
 HEBEN() = seg_heben!l1 -> seg_heben!l2 -> seg_heben!r1 -> seg_heben!r2 -> SKIP
 					
 					
 STEUER() = df_anfrage?zid  -> FREIGEBEN(zid)
-FREIGEBEN(zid) = SENKEN() ; df_freigabe!zid -> zug_rein?zid -> zug_raus?zid -> STEUER()
+FREIGEBEN(zid) = SENKEN() ; df_freigabe!zid -> zug_rein?zid -> zug_raus?zid -> HEBEN() ; STEUER()
 
 SIGNAL (state) = (df_freigabe?zid -> SIGNAL(g))
 				[]
-				(zug_raus?zid -> SIGNAL(r))
+				(zug_rein?zid -> SIGNAL(r))
 
 
-ZUG (zid) = zug_kommt!zid -> df_anfrage!zid -> df_freigabe?zid -> zug_rein!zid -> zug_raus!zid -> ZUG(zid)
+ZUG (zid) = zug_kommt.zid -> df_anfrage!zid -> df_freigabe?zid -> zug_rein.zid -> zug_raus.zid -> ZUG(zid)
 
 -----------
 --Gesamtsystem
 ------------ 
 SEG_INIT = SEGMENT(l1,oben) ||| SEGMENT(l2,unten) ||| SEGMENT(r1,oben) ||| SEGMENT(r2,oben)
 ZUG_INIT = ZUG(0) ||| ZUG(1) ||| ZUG(2) ||| ZUG(3)
-SYS = ((ZUG_INIT [|{|df_anfrage, df_freigabe, zug_raus|}|] STEUER()) [|{|df_freigabe, zug_rein|}|] SIGNAL(r)) [|{| seg_senken, seg_heben, seg_unten|}|] SEG_INIT
+
+ZUG_STEUER = ZUG_INIT [|{|df_anfrage, df_freigabe, zug_rein, zug_raus|}|] STEUER()
+SYS = (SIGNAL(r)[|{|df_freigabe, zug_rein|}|] ZUG_STEUER) 
+ [|{| seg_senken, seg_heben, seg_unten|}|] 
+ SEG_INIT
+
+
+
 ------------
 --Prüfungen
 ------------ 
 
 -- Zug fährt nur wenn alle Schranken unten sind
-
-
+UNTENR = (seg_unten.r1 -> seg_unten.r2 -> SKIP) [] (seg_unten.r2 -> seg_unten.r1 -> SKIP)
+UNTENL = (seg_unten.l1 -> seg_unten.l2 -> SKIP) [] (seg_unten.l2 -> seg_unten.l1 -> SKIP)
+--Vorgabe: Rechte Schranken schließen vor linken
+T1 =  UNTENL; UNTENR; zug_rein?zid -> zug_raus.zid -> T1
+-- Irrelevante channels
+A = {| zug_kommt, df_anfrage, df_freigabe, seg_senken, seg_heben, seg_oben |}
+assert T1 [T= SYS \ A
 -- Kein Zug ist dauerhaft blockiert
+
+
