@@ -59,8 +59,8 @@ ZUG_INIT = ZUG(0) ||| ZUG(1) ||| ZUG(2) ||| ZUG(3)
 
 ZUG_STEUER = ZUG_INIT [|{|df_anfrage, df_freigabe, zug_rein, zug_raus|}|] STEUER()
 SYS = (SIGNAL(r)[|{|df_freigabe, zug_rein|}|] ZUG_STEUER) 
- [|{| seg_senken, seg_heben, seg_unten|}|] 
- SEG_INIT
+		[|{| seg_senken, seg_heben, seg_unten|}|] 
+		SEG_INIT
 
 
 
@@ -76,6 +76,42 @@ T1 = UNTENR; UNTENL; zug_rein?zid -> zug_raus.zid -> T1
 -- Irrelevante channels
 A = {| zug_kommt, df_anfrage, df_freigabe, seg_senken, seg_heben, seg_oben |}
 assert T1 [T= SYS \ A
+
+
 -- Kein Zug ist dauerhaft blockiert
+--Wenn der Zug raus fährt wurde er nicht blockiert.
+Z_RAUS(zid) = zug_raus.zid -> SKIP
 
+TN4(a,b,c,d) = Z_RAUS(a); Z_RAUS(b); Z_RAUS(c); Z_RAUS(d); SKIP
 
+--Jeder mögliche Reihenfolge des Durchfahrens manuell modelliert
+TN = (TN4(0,1,2,3) ;TN)|~|
+	(TN4(0,1,3,2) ;TN)|~|
+	(TN4(0,2,1,3) ;TN)|~|
+	(TN4(0,2,3,1) ;TN)|~|
+	(TN4(0,3,1,2) ;TN)|~|
+	(TN4(0,3,2,1) ;TN)|~|
+
+	
+	(TN4(1,0,2,3) ;TN)|~|
+	(TN4(1,0,3,2) ;TN)|~|
+	(TN4(1,2,0,3) ;TN)|~|
+	(TN4(1,2,3,0) ;TN)|~|
+	(TN4(1,3,0,2) ;TN)|~|
+	(TN4(1,3,0,1) ;TN)|~|
+	
+	(TN4(2,0,1,3) ;TN)|~|
+	(TN4(2,0,3,1) ;TN)|~|
+	(TN4(2,1,0,3) ;TN)|~|
+	(TN4(2,1,3,0) ;TN)|~|
+	(TN4(2,3,0,1) ;TN)|~|
+	(TN4(2,3,1,0) ;TN)|~|
+
+	(TN4(3,0,1,2) ;TN)|~|
+	(TN4(3,0,3,2) ;TN)|~|
+	(TN4(3,1,0,2) ;TN)|~|
+	(TN4(3,1,2,0) ;TN)|~|
+	(TN4(3,2,0,1) ;TN)|~|
+	(TN4(3,2,1,0) ;TN)
+
+assert SYS \ {| zug_kommt, zug_rein, df_anfrage, df_freigabe, seg_senken, seg_heben, seg_oben, seg_unten |} [T= TN
