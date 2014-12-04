@@ -1,0 +1,22 @@
+nametype Id = {0,1,2,3}
+nametype Timeslots = {1..10}
+channel set_idle, set_eager, set_waiting, set_active, start_task : Id
+channel request: Id.Timeslots
+channel clock
+channel push, pop : Id
+
+FIFO(<>) = push?id -> FIFO(<id>)
+FIFO(<h>^s) = pop!h -> FIFO(s)
+[]
+push?id -> FIFO(<id>^<h>^s)
+
+TASK(id) = set_idle?id -> start_task?id -> set_eager!id -> request!id -> set_waiting?id -> set_active?id -> TASK(id)
+SCHED = ((pop?id -> set_active!id -> set_idle!id) -> SCHED
+	[]
+	(set_active!0 -> set_idle!0))) -> SCHED
+	|| 
+	(request?id -> push!id -> set_waiting!id)) -> SCHED
+CLOCK = clock
+SYS = TASK(0) || TASK(1) || TASK(2) || TASK(3) || SCHED
+
+REQ(list) = (request?id -> push!id) || FIFO(list)-> REQ(list)
