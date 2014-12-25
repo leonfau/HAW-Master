@@ -1,9 +1,9 @@
 nametype Id = {0,1,2,3}
 nametype Timeslots = {1..10}
 channel set_idle, set_eager, set_waiting, set_active, start_task : Id
-channel request: Id --.Timeslots
+channel request: Id.Timeslots
 channel tick
-channel push, pop : Id
+channel push, pop : Id.Timeslots
 
 datatype TaskState = idle|eager|waiting|active  
 
@@ -14,25 +14,26 @@ push?id -> QUEUE(<id>^<h>^s)
 
 --TASK(id) = set_idle!id ->  start_task?id -> set_eager!id -> request!id -> set_waiting?id -> set_active?id -> set_idle?id -> SKIP
 
-TASK(id, idle) = start_task?id -> TASK(id, eager)
-TASK(id, eager) = request!id -> set_waiting?id -> TASK(id, waiting)
-TASK(id, waiting) = set_active?id -> TASK(id,active)
-TASK(id, active) = set_idle?id -> TASK(id,idle)
+TASK(id, time, idle) = start_task?id -> TASK(id, time, eager)
+TASK(id, time, eager) = request!id.time -> set_waiting?id -> TASK(id, time, waiting)
+TASK(id, time, waiting) = set_active?id -> TASK(id, time, active)
+TASK(id, time, active) = set_idle?id -> TASK(id, time, idle)
 
 		
 --SCHED_DE(id) = set_idle!id -> push!id ->SKIP
 
-SCHED = request?id -> push!id -> set_waiting!id -> SCHED
+SCHED = request?id.time -> push!id.time -> set_waiting!id -> SCHED
 		[]
 		set_active!0 -> SCHED
 		[]
-		pop?id -> set_active!id ->  set_idle!id -> SCHED
+		pop?id.time -> set_active!id ->  set_idle!id -> SCHED
 		
 		
 TIMER = tick -> TIMER
 SCHED_RUN(0) = SKIP
 SCHED_RUN(time) = tick -> SCHED_RUN(time-1)
-TASK_INIT = (TASK(0, idle) ||| TASK(1, idle) ||| TASK(2, idle) ||| TASK(3, idle))
+
+TASK_INIT = (TASK(0, 3, idle) ||| TASK(1, 5, idle) ||| TASK(2, 5, idle) ||| TASK(3, 5, idle))
 TASK_STARTER = (start_task!0 -> TASK_STARTER) [] (start_task!1 -> TASK_STARTER) [] (start_task!2-> TASK_STARTER) [] (start_task!3-> TASK_STARTER)
 SYS = (TASK_INIT [|{|request, set_waiting, set_active, set_idle|}|] (SCHED [|{|push, pop|}|] QUEUE(<>))) [|{|start_task|}|] TASK_STARTER
 
@@ -42,8 +43,8 @@ SYS = (TASK_INIT [|{|request, set_waiting, set_active, set_idle|}|] (SCHED [|{|p
 
 --------------TEST
 A = {|start_task, set_eager, set_waiting|}
-T0 = request?1 -> set_waiting!1 ->  set_active!1 -> set_idle!1 -> SKIP
-assert SYS [T=T0 \A
+--T0 = request?1 -> set_waiting!1 ->  set_active!1 -> set_idle!1 -> SKIP
+--assert SYS [T=T0 \A
 
-T1 = request?1 -> request!2 -> set_active!1 -> set_active!2 -> set_idle!1 -> SKIP
-assert SYS [T=T1 \A
+--T1 = request?1 -> request!2 -> set_active!1 -> set_active!2 -> set_idle!1 -> SKIP
+--assert SYS [T=T1 \A
