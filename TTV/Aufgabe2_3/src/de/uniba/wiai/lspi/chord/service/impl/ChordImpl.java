@@ -1116,25 +1116,18 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 	public void broadcast(ID target, Boolean hit) {
 		this.logger.debug("App called broadcast");
 		List<Node> fTable = getFingerTable();
-		Collections.sort(fTable);
+		Collections.sort(fTable); // Wird hier nach ID sortiert?
 
 		int i = 0;
 		if (fTable.size() >= 1) {
 			while (fTable.size() >= 2 && i <= fTable.size() - 2) {
-				// @TODO: nur für zutreffende Knoten
 				try {
 					// Der darauffolgende Eintrag in der Finger Tabelle ist die
 					// range
-					
-				//	Ist die die Bedingung korrekt? 
-					if (fTable.get(i).getNodeID()
-							.compareTo(this.localNode.getNodeID()) < 0
-							&& fTable.get(i).getNodeID().compareTo(target) > 0) {
-						Broadcast info = new Broadcast(fTable.get(i + 1)
-								.getNodeID(), this.localNode.getNodeID(),
-								target, transactionID, hit);
-						fTable.get(i).broadcast(info);
-					}
+					Broadcast info = new Broadcast(fTable.get(i + 1)
+							.getNodeID(), this.localNode.getNodeID(), target,
+							transactionID, hit);
+					fTable.get(i).broadcast(info);
 				} catch (CommunicationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1146,11 +1139,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 			Broadcast info = new Broadcast(this.localNode.getNodeID(),
 					this.localNode.getNodeID(), target, transactionID, hit);
 			try {
-				if (fTable.get(i).getNodeID()
-						.compareTo(this.localNode.getNodeID()) < 0
-						&& fTable.get(i).getNodeID().compareTo(target) > 0) {
-					fTable.get(i).broadcast(info);
-				}
+				fTable.get(i).broadcast(info);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

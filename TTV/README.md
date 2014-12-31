@@ -1,2 +1,0 @@
-Technik/Technologie vernetzter Systeme
-==========
