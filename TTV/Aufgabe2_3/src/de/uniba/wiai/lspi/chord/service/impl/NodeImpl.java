@@ -45,7 +45,6 @@ import de.uniba.wiai.lspi.chord.com.Endpoint;
 import de.uniba.wiai.lspi.chord.com.Entry;
 import de.uniba.wiai.lspi.chord.com.Node;
 import de.uniba.wiai.lspi.chord.com.RefsAndEntries;
-import de.uniba.wiai.lspi.chord.com.rmi.RMIEndpoint;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
@@ -441,7 +440,7 @@ public final class NodeImpl extends Node {
 		}
 		// rebroadcast an alle Knoten innerhalb der Range
 		List<Node> fTable = impl.getFingerTable();
-		Collections.sort(fTable); // Wird hier nach ID sortiert?
+		Collections.sort(fTable); // Wird hier nach ID sortiert? //Ja compareable in Node sortiert nach Ids
 		for (int i = 0; i <= fTable.size() - 1; i++) {
 			Node receiver = fTable.get(i);
 			if (!receiver.getNodeID().equals(impl.getID())
@@ -451,7 +450,7 @@ public final class NodeImpl extends Node {
 
 				ID rng = i < (fTable.size() - 1) ? fTable.get(i + 1)
 						.getNodeID() : info.getRange();
-				// Muss transactionID geändert werden?
+				// Muss transactionID geändert werden? // Ich glaube die wird nur von ChordImpl hochgez�hlt
 				Broadcast newInfo = new Broadcast(rng, info.getSource(),
 						info.getTarget(), info.getTransaction(), info.getHit());
 				

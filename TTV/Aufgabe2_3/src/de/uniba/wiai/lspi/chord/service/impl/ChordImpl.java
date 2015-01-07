@@ -1118,6 +1118,20 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		List<Node> fTable = getFingerTable();
 		Collections.sort(fTable); // Wird hier nach ID sortiert?
 
+		//zweite Version Anfang
+		for(int i = 0; i < fTable.size();i++){
+			ID nodeRange = (i == fTable.size() - 1 ? fTable.get(i).getNodeID() : fTable.get(i + 1).getNodeID());
+			try {
+				Broadcast info = new Broadcast(nodeRange, this.localNode.getNodeID(), target,transactionID, hit);
+				fTable.get(i).broadcast(info); //Broadcast bei NodeImpl aufrufen
+				transactionID++; //Hochzählen bei jedem neuen Broadcast zu Node oder am Ende?
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		//zweite Version Ende
+		/**
 		int i = 0;
 		if (fTable.size() >= 1) {
 			while (fTable.size() >= 2 && i <= fTable.size() - 2) {
@@ -1146,6 +1160,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 			}
 			transactionID++;
 		}
+		**/
 	}
 
 	public void setCallback(NotifyCallback callback) {
