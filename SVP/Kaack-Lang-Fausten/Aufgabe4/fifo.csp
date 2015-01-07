@@ -2,49 +2,56 @@ nametype Id = {0,1,2,3}
 nametype Timeslots = {1..10}
 channel set_idle, set_eager, set_waiting, set_active, start_task : Id
 channel request: Id.Timeslots
-channel tick
+channel tick,empty
 channel push, pop : Id.Timeslots
 
 datatype TaskState = idle|eager|waiting|active  
 
 QUEUE(<>) = push?id -> QUEUE(<id>)
+			[]
+			pop?h -> empty-> QUEUE(<>)
+QUEUE(<h>) = pop!h -> QUEUE(<>)
 QUEUE(<h>^s) = pop!h -> QUEUE(s)
-[]
-push?id -> QUEUE(<id>^<h>^s)
+				[]
+			   push?id -> QUEUE(<id>^<h>^s)
 
---TASK(id) = set_idle!id ->  start_task?id -> set_eager!id -> request!id -> set_waiting?id -> set_active?id -> set_idle?id -> SKIP
-
-TASK(id, time, idle) = start_task?id -> TASK(id, time, eager)
-TASK(id, time, eager) = request!id.time -> set_waiting?id -> TASK(id, time, waiting)
-TASK(id, time, waiting) = set_active?id -> TASK(id, time, active)
-TASK(id, time, active) = set_idle?id -> TASK(id, time, idle)
+TASK(id, time, idle) = start_task.id -> TASK(id, time, eager)
+TASK(id, time, eager) = request!id.time -> set_waiting.id -> TASK(id, time, waiting)
+						[]
+						request!id.time -> set_active.id -> TASK(id, time, active)
+						
+TASK(id, time, waiting) = set_active.id -> TASK(id, time, active)
+TASK(id, time, active) = set_idle.id -> TASK(id, time, idle)
 
 --Zeit ist 0 -> alten Task descedulen und dummy Task oder konkreten Task von der Queue starten
-SCHED(0, id) = set_idle!id -> set_active!0 -> SCHED(3, 0)
+SCHED(0, id) = set_idle!id -> pop?newid.time -> set_active!newid -> SCHED(time, newid)
 				[]
-			   set_idle!id -> pop?id.time -> set_active!id -> set_idle!id -> SCHED(time, id)
+				set_idle!id -> pop?newid.time  -> empty -> start_task!0 -> set_active!0 -> SCHED(time, newid)
+				[]
+			   request?newid.newtime -> push!newid.newtime -> set_waiting!newid -> SCHED(0, id)
 			   
 -- Zeit != 0 -> Request zwischen den Ticks annehmen und in Warteliste setzen
-SCHED(time, id) = request?id.time -> push!id.time -> set_waiting!id -> tick -> SCHED(time-1, id)
+SCHED(time, id) = request?newid.newtime -> push!newid.newtime -> set_waiting!newid -> SCHED(time-1, id)
 				  []
-				  tick -> SCHED(time-1, id)
-				
-		
+				  SCHED(time-1, id)	
+				  
+				  
+
+
 TIMER = tick -> TIMER
 
 TASK_INIT = (TASK(0, 3, idle) ||| TASK(1, 3, idle) ||| TASK(2, 5, idle) ||| TASK(3, 6, idle))
-TASK_STARTER = (start_task!0 -> TASK_STARTER) [] (start_task!1 -> TASK_STARTER) [] (start_task!2-> TASK_STARTER) [] (start_task!3-> TASK_STARTER)
-SYS = ((TASK_INIT [|{|request, set_waiting, set_active, set_idle|}|] (SCHED(0,0) [|{|push, pop|}|] QUEUE(<>))) [|{|start_task|}|] TASK_STARTER) [|{|tick|}|] TIMER
-
--- Wie sendet man regelmäßg ticks
--- Wie testet man richtig.
+SYS = TASK_INIT [|{|request, set_waiting, set_active, set_idle|}|] (SCHED(3,0) [|{|push, pop|}|] QUEUE(<>))-- [|{|tick|}|] TIMER)
 
 
 
 --------------TEST
-A = {|start_task, set_eager, set_waiting|}
-T0 = request?1.3 -> set_waiting!1 ->  set_active!1 -> tick -> tick -> tick -> set_idle!1 -> SKIP
-assert SYS [T=T0 \A
+assert SYS :[deadlock free [F]]
+
+
+A = {|set_eager, pop, push|}
+T0 = start_task.1 -> request.1.3 -> push.1.3 -> set_waiting.1 ->  set_active.1 -> set_idle!1 -> SKIP
+assert SYS [T=T0 
 
 --T1 = request?1 -> request!2 -> set_active!1 -> set_active!2 -> set_idle!1 -> SKIP
---assert SYS [T=T1 \A
+--assert SYS [T=T1
