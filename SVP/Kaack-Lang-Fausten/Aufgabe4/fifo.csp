@@ -8,14 +8,14 @@ channel push, pop : Id.Timeslots
 datatype TaskState = idle|eager|waiting|active  
 
 QUEUE(<>) = push?id -> QUEUE(<id>)
-			[]
-			pop?h -> empty-> QUEUE(<>)
-QUEUE(<h>) = pop!h -> QUEUE(<>)
+QUEUE(<h>) = pop!h -> empty -> QUEUE(<>)
 QUEUE(<h>^s) = pop!h -> QUEUE(s)
 				[]
 			   push?id -> QUEUE(<id>^<h>^s)
 
 TASK(id, time, idle) = start_task.id -> TASK(id, time, eager)
+						[]
+						start_task.0 -> TASK(0,3,active)
 TASK(id, time, eager) = request!id.time -> set_waiting.id -> TASK(id, time, waiting)
 						[]
 						request!id.time -> set_active.id -> TASK(id, time, active)
@@ -24,9 +24,10 @@ TASK(id, time, waiting) = set_active.id -> TASK(id, time, active)
 TASK(id, time, active) = set_idle.id -> TASK(id, time, idle)
 
 --Zeit ist 0 -> alten Task descedulen und dummy Task oder konkreten Task von der Queue starten
+--Timer nur indirekt eingebaut, dadurch kann dieser nicht regelmäßig laufen
 SCHED(0, id) = set_idle!id -> pop?newid.time -> set_active!newid -> SCHED(time, newid)
 				[]
-				set_idle!id -> pop?newid.time  -> empty -> start_task!0 -> set_active!0 -> SCHED(time, newid)
+				set_idle!id -> pop?newid.time  -> empty -> start_task!0 -> SCHED(time, newid)
 				[]
 			   request?newid.newtime -> push!newid.newtime -> set_waiting!newid -> SCHED(0, id)
 			   
@@ -40,18 +41,17 @@ SCHED(time, id) = request?newid.newtime -> push!newid.newtime -> set_waiting!new
 
 TIMER = tick -> TIMER
 
-TASK_INIT = (TASK(0, 3, idle) ||| TASK(1, 3, idle) ||| TASK(2, 5, idle) ||| TASK(3, 6, idle))
+TASK_INIT = (TASK(0, 3, active) ||| TASK(1, 3, idle) ||| TASK(2, 5, idle) ||| TASK(3, 6, idle))
 SYS = TASK_INIT [|{|request, set_waiting, set_active, set_idle|}|] (SCHED(3,0) [|{|push, pop|}|] QUEUE(<>))-- [|{|tick|}|] TIMER)
 
 
 
 --------------TEST
-assert SYS :[deadlock free [F]]
-
-
+-- Tests werden mit Stop beendet, da die Anwendung in einer Endlosschleife läuft und dadurch nicht mit einem Tick beendet werden kann.
 A = {|set_eager, pop, push|}
-T0 = start_task.1 -> request.1.3 -> push.1.3 -> set_waiting.1 ->  set_active.1 -> set_idle!1 -> SKIP
-assert SYS [T=T0 
+T0 = start_task.1 -> request.1.3 -> set_waiting.1 -> set_idle.0 ->  set_active.1 -> set_idle.1 -> empty -> start_task.0  -> STOP
+assert SYS \ A [T=T0
 
---T1 = request?1 -> request!2 -> set_active!1 -> set_active!2 -> set_idle!1 -> SKIP
---assert SYS [T=T1
+T1 = start_task.1 -> start_task.2 -> start_task.3 -> request.1.3 -> set_waiting.1 -> set_idle.0 ->  set_active.1 -> request.2.5 -> set_waiting.2 -> set_idle.1 ->  set_active.2 -> set_idle.2 -> empty -> start_task.0 ->  STOP
+assert SYS \ A [T=T1
+
