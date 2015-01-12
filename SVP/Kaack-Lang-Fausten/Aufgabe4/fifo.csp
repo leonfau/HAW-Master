@@ -45,7 +45,7 @@ SCHED(time, id) = request?newid.newtime -> push!newid.newtime -> set_waiting!new
 				  
 
 
-TIMER = tick -> TIMER
+--TIMER = tick -> TIMER
 
 TASK_INIT = (TASK(0, 3, active) ||| TASK(1, 3, idle) ||| TASK(2, 5, idle) ||| TASK(3, 6, idle))
 SYS = TASK_INIT [|{|request, set_waiting, set_active, set_idle|}|] (SCHED(3,0) [|{|push, pop, empty|}|] QUEUE(<>))-- [|{|tick|}|] TIMER)
@@ -66,3 +66,20 @@ T1 = start_task.1 -> start_task.2 -> start_task.3
 	
 assert SYS \ A [T=T1
 
+
+T2 = start_task.1 -> start_task.2 -> start_task.3 
+	-> request.1.3 -> set_waiting.1 -> set_idle.0 ->  set_active.1 
+    -> set_idle.1 -> empty -> set_active.0 -> request.2.5 
+	-> set_waiting.2 ->set_idle.0 -> set_active.2 -> set_idle.2 
+	-> empty -> set_active.0 -> request.3.6 -> set_waiting.3 
+	-> set_idle.0 -> set_active.3 -> set_idle.3 -> empty -> set_active.0 -> STOP
+	
+assert SYS \ A [T=T2
+
+T3 = start_task.1 -> start_task.2 -> start_task.3 
+	-> request.2.5 -> set_waiting.2 -> set_idle.0 ->  set_active.2 -> set_idle.2 -> empty -> set_active.0 -> set_idle.0 -> empty -> set_active.0 
+	-> request.1.3 -> set_waiting.1 -> set_idle.0 ->  set_active.1 -> set_idle.1
+	-> empty -> set_active.0 -> request.3.6 -> set_waiting.3 
+	-> set_idle.0 -> set_active.3 -> set_idle.3 -> empty -> set_active.0 -> STOP
+	
+assert SYS \ A [T=T3
