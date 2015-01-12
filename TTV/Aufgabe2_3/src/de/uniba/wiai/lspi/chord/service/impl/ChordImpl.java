@@ -1124,12 +1124,13 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 			try {
 				Broadcast info = new Broadcast(nodeRange, this.localNode.getNodeID(), target,transactionID, hit);
 				fTable.get(i).broadcast(info); //Broadcast bei NodeImpl aufrufen
-				transactionID++; //Hochzählen bei jedem neuen Broadcast zu Node oder am Ende?
+				
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		transactionID++; //Hochzï¿½hlen bei jedem neuen Broadcast zu Node oder am Ende? // Denke am Ende (nach der For schleife), da es sich um den gleichen Broadcast handelt, der an alle gesendet wird.
 		//zweite Version Ende
 		/**
 		int i = 0;
