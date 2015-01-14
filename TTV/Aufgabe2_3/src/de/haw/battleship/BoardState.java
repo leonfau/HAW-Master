@@ -1,4 +1,4 @@
-package de.haw.connectfour;
+package de.haw.battleship;
 
 public class BoardState {
 	
