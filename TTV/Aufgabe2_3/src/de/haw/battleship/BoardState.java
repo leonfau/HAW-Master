@@ -4,10 +4,10 @@ public class BoardState {
 	
 	FieldState[] board;
 	
-	public BoardState(int size){
+	public BoardState(int size, FieldState initState){
 		board = new FieldState[size];
 		for(int i = 0; i < size; i++)
-			board[i] = FieldState.WATER;
+			board[i] = initState;
 	}
 	
 	public BoardState(FieldState[] init){

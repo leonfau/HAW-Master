@@ -34,7 +34,7 @@ public class Game {
 		System.out.println(report.printFingerTable());
 		
 		//Schiffe setzen und Board initialisieren //TODO
-		ownBoard = new BoardState(I);
+		ownBoard = new BoardState(I, FieldState.WATER);
 		
 		int i = 0;
 		Random ran = new Random();
