@@ -37,9 +37,9 @@ public class Game {
 		ownBoard = new BoardState(I);
 		
 		int i = 0;
-		Random ran = new Random(I);
+		Random ran = new Random();
 		while (i != S) {
-			int r = ran.nextInt();
+			int r = ran.nextInt(I);
 			if (ownBoard.getPositionState(r) != FieldState.SHIP) {
 				ownBoard.setShip(r);
 				i++;
