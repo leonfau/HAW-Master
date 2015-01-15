@@ -3,14 +3,10 @@ package de.haw.battleship;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.List;
 
-
-import de.uniba.wiai.lspi.chord.com.Node;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.Chord;
@@ -62,7 +58,9 @@ public class Game {
 	private boolean isBeginner(){
 		BigInteger maxID = new BigInteger("2").pow(160).subtract(BigInteger.ONE);
 		//TODO
-		return false;
+		return ID.valueOf(maxID).isInInterval(
+				ID.valueOf(chord.getPredecessorID().toBigInteger().add(BigInteger.ONE)),
+				chord.getID());
 	}
 
 	private void start() {
@@ -70,6 +68,8 @@ public class Game {
 		if(this.isBeginner()){
 			System.out.println("is beginnger");
 			attack();
+		}else {
+			System.out.println("is not beginner");
 		}
 		
 	}
@@ -120,7 +120,7 @@ public class Game {
 		}
 		
 		//Wo auf das Board wurde geschossen?
-		
+		//TODO
 		enemyBoards.put(target, targetBoard);
 	}
 
