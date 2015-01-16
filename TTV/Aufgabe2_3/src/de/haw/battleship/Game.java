@@ -3,10 +3,14 @@ package de.haw.battleship;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import de.uniba.wiai.lspi.chord.com.Node;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.Chord;
@@ -25,12 +29,11 @@ public class Game {
 
 	private static final int I = 100;
 	private static final int S = 10;
-
-
+	private BigInteger intervalSize;
+	private BigInteger rangeStart;
 
 	public void init(String[] args) {
 		chord = createOrJoinChord(args);
-		
 
 		// Debug
 		System.out.println(chord.getID());
@@ -43,7 +46,7 @@ public class Game {
 		int i = 0;
 		Random ran = new Random();
 		while (i != S) {
-			int r = ran.nextInt(I-1)+1;
+			int r = ran.nextInt(I - 1) + 1;
 			if (ownBoard.getPositionState(r) != FieldState.SHIP) {
 				ownBoard.setShip(r);
 				i++;
@@ -54,24 +57,46 @@ public class Game {
 
 		strategy = new RandomStrategy();
 	}
-	
-	private boolean isBeginner(){
-		BigInteger maxID = new BigInteger("2").pow(160).subtract(BigInteger.ONE);
-		//TODO
+
+	private boolean isBeginner() {
+		BigInteger maxID = new BigInteger("2").pow(160)
+				.subtract(BigInteger.ONE);
+		// TODO
 		return ID.valueOf(maxID).isInInterval(
-				ID.valueOf(chord.getPredecessorID().toBigInteger().add(BigInteger.ONE)),
-				chord.getID());
+				ID.valueOf(chord.getPredecessorID().toBigInteger()
+						.add(BigInteger.ONE)), chord.getID());
 	}
 
 	private void start() {
-		// check beginner 
-		if(this.isBeginner()){
+		// Build Enemymap
+		ChordImpl c = (ChordImpl) chord;
+		List<Node> fTable = c.getFingerTable();
+
+		for (Node n : fTable) {
+			if (!enemyBoards.containsKey(n.getNodeID())) {
+				enemyBoards.put(n.getNodeID(), new BoardState(I,
+						FieldState.UNKNOWN));
+			}
+		}
+
+		// calculate Range
+		BigInteger local = chord.getID().toBigInteger();
+		rangeStart = chord.getPredecessorID().toBigInteger();
+		if (rangeStart == null) {
+			rangeStart = BigInteger.ZERO;
+		}
+		rangeStart.add(BigInteger.ONE);
+		intervalSize = local.subtract(rangeStart).divide(
+				new BigInteger(String.valueOf(I)));
+
+		// check beginner
+		if (this.isBeginner()) {
 			System.out.println("is beginnger");
 			attack();
-		}else {
+		} else {
 			System.out.println("is not beginner");
 		}
-		
+
 	}
 
 	private Chord createOrJoinChord(String[] args) {
@@ -105,7 +130,7 @@ public class Game {
 	private void attack() {
 		System.out.println("attack");
 		ID Target = strategy.findNextTarget(enemyBoards, chord);
-		try { 
+		try {
 			chord.retrieve(Target);
 		} catch (ServiceException e) {
 			e.printStackTrace();
@@ -113,22 +138,51 @@ public class Game {
 	}
 
 	public void updateInformation(ID source, ID target, Boolean hit) {
-		System.out.println("update");
-		BoardState targetBoard = enemyBoards.get(target);
-		if(targetBoard == null){
-			targetBoard = new BoardState(I, FieldState.UNKNOWN);
+		if(enemyBoards.get(source) == null){
+			enemyBoards.put(source, new BoardState(I, FieldState.UNKNOWN));
 		}
+
+		System.out.println("update");
 		
-		//Wo auf das Board wurde geschossen?
-		//TODO
+		List<ID> nodeIds = new ArrayList<ID>(enemyBoards.keySet());
+		nodeIds.add(chord.getID());
+		Collections.sort(nodeIds);
+		
+		ID id1 = new ID(null);
+		ID id2 = new ID(null);
+		boolean found = false;
+		int i = 0;
+		while (!found && i == nodeIds.size()-1) {
+			id1 = nodeIds.get(i);
+			id2 = new ID(nodeIds.get(i+1).toBigInteger().add(BigInteger.ONE).toByteArray());
+			
+			found = target.isInInterval(id1, id2);
+			i++;
+		}
+		int field = id2.toBigInteger().subtract(id1.toBigInteger()).divide(BigInteger.valueOf(I)).intValue();
+		BoardState targetBoard = enemyBoards.get(nodeIds.get(i));
+		
+		System.out.println(nodeIds.get(0).toDecimalString());
+		System.out.println(nodeIds.get(1).toDecimalString());
+		System.out.println(field);
+		
+		if(hit){
+			targetBoard.setHit(field);
+		}else{
+			targetBoard.setWater(field);
+		}
+
 		enemyBoards.put(target, targetBoard);
 	}
 
 	public void checkHit(ID target) {
 		System.out.println("check hit");
+		BigInteger field = target.toBigInteger().subtract(rangeStart)
+				.divide(intervalSize);
+		System.out.println(field);
 
 		// check if Hit
-		boolean hit = false;
+		boolean hit = ownBoard.isHit(field.intValue());
 		// Broadcast result
 		chord.broadcast(target, hit);
 		attack();

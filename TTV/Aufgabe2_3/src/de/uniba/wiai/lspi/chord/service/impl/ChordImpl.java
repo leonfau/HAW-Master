@@ -1114,20 +1114,32 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 	// send broadcast to all nodes in finger table
 	@Override
 	public void broadcast(ID target, Boolean hit) {
+		System.out.println("BROADCAST");
 		this.logger.debug("App called broadcast");
 		List<Node> fTable = getFingerTable();
 		Collections.sort(fTable); // Wird hier nach ID sortiert?
 
 		//zweite Version Anfang
-		for(int i = 0; i < fTable.size();i++){
-			ID nodeRange = (i == fTable.size() - 1 ? fTable.get(i).getNodeID() : fTable.get(i + 1).getNodeID());
+		if (fTable.size() == 1) {
+			ID nodeRange = fTable.get(0).getNodeID();
+			Broadcast info = new Broadcast(nodeRange, this.localNode.getNodeID(), target,transactionID, hit);
 			try {
-				Broadcast info = new Broadcast(nodeRange, this.localNode.getNodeID(), target,transactionID, hit);
-				fTable.get(i).broadcast(info); //Broadcast bei NodeImpl aufrufen
-				
+				fTable.get(0).broadcast(info);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} //Broadcast bei NodeImpl aufrufen
+		} else {
+			for(int i = 0; i <= fTable.size()-1;i++){
+				ID nodeRange = (i == fTable.size() - 1 ? fTable.get(i).getNodeID() : fTable.get(i + 1).getNodeID());
+				try {
+					Broadcast info = new Broadcast(nodeRange, this.localNode.getNodeID(), target,transactionID, hit);
+					fTable.get(i).broadcast(info); //Broadcast bei NodeImpl aufrufen
+					
+				} catch (CommunicationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		transactionID++; //Hochz�hlen bei jedem neuen Broadcast zu Node oder am Ende?

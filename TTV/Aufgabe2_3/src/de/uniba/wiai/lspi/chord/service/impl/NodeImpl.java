@@ -435,6 +435,7 @@ public final class NodeImpl extends Node {
 	// TODO: noch nicht getestet
 	@Override
 	public final void broadcast(Broadcast info) throws CommunicationException {
+		System.out.println("NODEIMPL BROADCAST");
 		if (this.logger.isEnabledFor(DEBUG)) {
 			this.logger.debug(" Send broadcast message");
 		}

@@ -19,6 +19,9 @@ public class GameState {
 	
 	public void addPlayer(Player player){
 		this.player.add(player);
+		Player pl = findPlayerForID(player.getMaxID());
+		//TODO update old Player if necessary
+		//if(pl.)
 	}
 	
 	public Player findPlayerForID(ID id){

@@ -19,22 +19,30 @@ public class BoardState {
 	}
 	
 	public FieldState getPositionState(int position){
-		if(position-1 < board.length)
-			return board[position-1];
+		if(position < board.length)
+			return board[position];
 		else
 			return FieldState.UNKNOWN;
 	}
 	
 	public void setShip(int position){
-		board[position-1] = FieldState.SHIP;
+		board[position] = FieldState.SHIP;
 	}
 	
-	public FieldState isHit(int position){
-		if(board[position-1] == FieldState.SHIP){
-			board[position-1] = FieldState.HIT;
-			return FieldState.HIT;
+	public void setHit(int position){
+		board[position] = FieldState.HIT;
+	}
+	
+	public void setWater(int position){
+		board[position] = FieldState.WATER;
+	}
+	
+	public boolean isHit(int position){
+		if(board[position] == FieldState.SHIP){
+			board[position] = FieldState.HIT;
+			return true;
 		}else {
-			return FieldState.WATER;
+			return false;
 		}		
 	}
 }
