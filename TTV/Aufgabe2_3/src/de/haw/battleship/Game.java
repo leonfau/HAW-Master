@@ -33,17 +33,15 @@ public class Game {
 
 	public void init(String[] args) {
 		chord = createOrJoinChord(args);
-		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID());
 		
 		// Debug
 		System.out.println(chord.getID());
 		Report report = (Report) chord;
 		System.out.println(report.printFingerTable());
 
-		initOwnFields();
-		gameState.addPlayerIfNotExists(chord.getPredecessorID());
 
-		strategy = new RandomStrategy();
+
+		strategy = new RandomStrategy(S, I);
 	}
 	
 	private void initOwnFields(){
@@ -55,18 +53,8 @@ public class Game {
 			gameState.setState(aktuelPosition, FieldState.WATER);
 			IdMath.addToID(aktuelPosition, intervall);
 		}
-		//set ships
-		for(int i = 0; i < S; i++){
-			Random ran = new Random();
-			int r = ran.nextInt((I - 1) + 1)+1;
-			//if there is already an ship on ID try again
-			ID shipID = IdMath.calcIDforField(gameState.getMyPlayerMin(), intervall, r);
-			while (gameState.getFieldState(shipID) == FieldState.SHIP){
-				r = ran.nextInt((I - 1) + 1)+1;
-				shipID = IdMath.calcIDforField(gameState.getMyPlayerMin(), intervall, r);
-			}
-			gameState.setState(shipID, FieldState.SHIP);		
-		}
+		
+		strategy.setShips(gameState, intervall);
 	}
 
 	private boolean isBeginner() {
@@ -79,6 +67,10 @@ public class Game {
 	}
 
 	private void start() {
+		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID());
+		initOwnFields();
+		gameState.addPlayerIfNotExists(chord.getPredecessorID());
+		
 		//Init player in fingerTable
 		ChordImpl c = (ChordImpl) chord;
 		List<Node> fTable = c.getFingerTable();
@@ -130,7 +122,7 @@ public class Game {
 		
 		//TODO an neues Datenmodell anpassen
 		System.out.println("attack");
-		ID Target = strategy.findNextTarget(enemyBoards, chord);
+		ID Target = strategy.findNextTarget(gameState, chord);
 		try {
 			chord.retrieve(Target);
 		} catch (ServiceException e) {

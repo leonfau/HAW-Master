@@ -1,6 +1,5 @@
 package de.haw.battleship;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,19 @@ public class GameState {
 		this.myPlayerMax = myPlayerMax;
 	}
 
+	/**
+	 * Return opponents map
+	 * @return
+	 */
+	public List<ID> getOpponents(){
+		List<ID> opponents = new ArrayList<ID>(player.keySet());
+		opponents.remove(this.getMyPlayerMax());
+		return opponents;
+	}
 	
+	public ID getPlayerMinID(ID maxID){
+		return player.get(maxID);
+	}
 	/**
 	 * add new player and update min ranges if necessary
 	 * @param playerMin
