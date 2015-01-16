@@ -35,8 +35,46 @@ public class IdMath {
 			return testID.isInInterval(subOneFromID(minRange), addOneToID(maxRange));
 		}
 		
+		/**
+		 * Create new zero ID
+		 * @return
+		 */
 		public static ID zeroID(){
 			return new ID(BigInteger.ZERO.toByteArray());
+		}
+		
+		
+		/**
+		 * calculate size for single field
+		 * @param min
+		 * @param max
+		 * @param fieldcount
+		 * @return
+		 */
+		public static BigInteger calculateFieldSize(ID min, ID max, int fieldcount){
+			// TODO muss hier nochmal irgendwo +/-1 gerechnet werden?
+			return max.toBigInteger().subtract(min.toBigInteger()).divide(BigInteger.valueOf(fieldcount));
+		}
+		
+		/**
+		 * add given value to id
+		 * @param id
+		 * @param value
+		 * @return
+		 */
+		public static ID addToID(ID id, BigInteger value){
+			return new ID(id.toBigInteger().add(value).toByteArray());
+		}
+		
+		/**
+		 * caluculate ID for field
+		 * @param startID
+		 * @param intervall
+		 * @param field
+		 * @return
+		 */
+		public static ID calcIDforField(ID startID, BigInteger intervall, int field){
+			return new ID(intervall.multiply(BigInteger.valueOf(field)).add(startID.toBigInteger()).toByteArray());
 		}
 		
 }

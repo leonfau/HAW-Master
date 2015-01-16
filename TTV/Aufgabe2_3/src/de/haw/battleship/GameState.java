@@ -102,6 +102,17 @@ public class GameState {
 	}
 	
 	/**
+	 * add player if not exists and calculate possible min id
+	 * @param playerMin
+	 * @param playerMax
+	 */
+	public void addPlayerIfNotExists(ID playerMax){
+		if(this.findPlayerForID(playerMax)== null){
+			this.addPlayer(findPossibleMinId(playerMax), playerMax);
+		}
+	}
+	
+	/**
 	 * find player with given id range
 	 * @param id
 	 * @return array first entry is min value, second is max value, null if none found

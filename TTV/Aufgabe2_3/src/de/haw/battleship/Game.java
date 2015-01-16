@@ -23,8 +23,7 @@ import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 public class Game {
 
 	private Chord chord;
-	private BoardState ownBoard;
-	private Map<ID, BoardState> enemyBoards;
+	private GameState gameState;
 	Strategy strategy;
 
 	private static final int I = 100;
@@ -34,28 +33,40 @@ public class Game {
 
 	public void init(String[] args) {
 		chord = createOrJoinChord(args);
-
+		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID());
+		
 		// Debug
 		System.out.println(chord.getID());
 		Report report = (Report) chord;
 		System.out.println(report.printFingerTable());
 
-		// Schiffe setzen und Board initialisieren //TODO
-		ownBoard = new BoardState(I, FieldState.WATER);
-
-		int i = 0;
-		Random ran = new Random();
-		while (i != S) {
-			int r = ran.nextInt(I - 1) + 1;
-			if (ownBoard.getPositionState(r) != FieldState.SHIP) {
-				ownBoard.setShip(r);
-				i++;
-			}
-		}
-
-		enemyBoards = new HashMap<ID, BoardState>();
+		initOwnFields();
+		gameState.addPlayerIfNotExists(chord.getPredecessorID());
 
 		strategy = new RandomStrategy();
+	}
+	
+	private void initOwnFields(){
+		BigInteger intervall = IdMath.calculateFieldSize(gameState.getMyPlayerMin(), gameState.getMyPlayerMax(), I);
+		// Schiffe setzen und Board initialisieren //TODO
+		ID aktuelPosition = gameState.getMyPlayerMin();
+		//init all fields with zero
+		while(aktuelPosition.compareTo(gameState.getMyPlayerMax()) <= 0){
+			gameState.setState(aktuelPosition, FieldState.WATER);
+			IdMath.addToID(aktuelPosition, intervall);
+		}
+		//set ships
+		for(int i = 0; i < S; i++){
+			Random ran = new Random();
+			int r = ran.nextInt((I - 1) + 1)+1;
+			//if there is already an ship on ID try again
+			ID shipID = IdMath.calcIDforField(gameState.getMyPlayerMin(), intervall, r);
+			while (gameState.getFieldState(shipID) == FieldState.SHIP){
+				r = ran.nextInt((I - 1) + 1)+1;
+				shipID = IdMath.calcIDforField(gameState.getMyPlayerMin(), intervall, r);
+			}
+			gameState.setState(shipID, FieldState.SHIP);		
+		}
 	}
 
 	private boolean isBeginner() {
@@ -68,27 +79,15 @@ public class Game {
 	}
 
 	private void start() {
-		// Build Enemymap
+		//Init player in fingerTable
 		ChordImpl c = (ChordImpl) chord;
 		List<Node> fTable = c.getFingerTable();
-
 		for (Node n : fTable) {
-			if (!enemyBoards.containsKey(n.getNodeID())) {
-				enemyBoards.put(n.getNodeID(), new BoardState(I,
-						FieldState.UNKNOWN));
-			}
+			gameState.addPlayerIfNotExists(n.getNodeID());
 		}
-
-		// calculate Range
-		BigInteger local = chord.getID().toBigInteger();
-		rangeStart = chord.getPredecessorID().toBigInteger();
-		if (rangeStart == null) {
-			rangeStart = BigInteger.ZERO;
-		}
-		rangeStart.add(BigInteger.ONE);
-		intervalSize = local.subtract(rangeStart).divide(
-				new BigInteger(String.valueOf(I)));
-
+		//vll noch etwas über n.findSuccessor(id) machen
+		
+		
 		// check beginner
 		if (this.isBeginner()) {
 			System.out.println("is beginnger");
@@ -128,6 +127,8 @@ public class Game {
 	}
 
 	private void attack() {
+		
+		//TODO an neues Datenmodell anpassen
 		System.out.println("attack");
 		ID Target = strategy.findNextTarget(enemyBoards, chord);
 		try {
@@ -138,41 +139,9 @@ public class Game {
 	}
 
 	public void updateInformation(ID source, ID target, Boolean hit) {
-		if(enemyBoards.get(source) == null){
-			enemyBoards.put(source, new BoardState(I, FieldState.UNKNOWN));
-		}
-
+		gameState.addPlayerIfNotExists(source);
 		System.out.println("update");
-		
-		List<ID> nodeIds = new ArrayList<ID>(enemyBoards.keySet());
-		nodeIds.add(chord.getID());
-		Collections.sort(nodeIds);
-		
-		ID id1 = new ID(null);
-		ID id2 = new ID(null);
-		boolean found = false;
-		int i = 0;
-		while (!found && i == nodeIds.size()-1) {
-			id1 = nodeIds.get(i);
-			id2 = new ID(nodeIds.get(i+1).toBigInteger().add(BigInteger.ONE).toByteArray());
-			
-			found = target.isInInterval(id1, id2);
-			i++;
-		}
-		int field = id2.toBigInteger().subtract(id1.toBigInteger()).divide(BigInteger.valueOf(I)).intValue();
-		BoardState targetBoard = enemyBoards.get(nodeIds.get(i));
-		
-		System.out.println(nodeIds.get(0).toDecimalString());
-		System.out.println(nodeIds.get(1).toDecimalString());
-		System.out.println(field);
-		
-		if(hit){
-			targetBoard.setHit(field);
-		}else{
-			targetBoard.setWater(field);
-		}
-
-		enemyBoards.put(target, targetBoard);
+		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
 	}
 
 	public void checkHit(ID target) {
@@ -180,9 +149,8 @@ public class Game {
 		BigInteger field = target.toBigInteger().subtract(rangeStart)
 				.divide(intervalSize);
 		System.out.println(field);
-
-		// check if Hit
-		boolean hit = ownBoard.isHit(field.intValue());
+		
+		boolean hit = gameState.getFieldState(target) == FieldState.SHIP;
 		// Broadcast result
 		chord.broadcast(target, hit);
 		attack();
