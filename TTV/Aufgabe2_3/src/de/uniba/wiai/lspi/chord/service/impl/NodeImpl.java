@@ -438,23 +438,30 @@ public final class NodeImpl extends Node {
 		if (this.logger.isEnabledFor(DEBUG)) {
 			this.logger.debug(" Send broadcast message");
 		}
-		// rebroadcast an alle Knoten innerhalb der Range
-		List<Node> fTable = impl.getFingerTable();
-		Collections.sort(fTable); // Wird hier nach ID sortiert? //Ja compareable in Node sortiert nach Ids
-		for (int i = 0; i <= fTable.size() - 1; i++) {
-			Node receiver = fTable.get(i);
-			if (!receiver.getNodeID().equals(impl.getID())
-					&& !receiver.getNodeID().equals(info.getRange())
-					&& receiver.getNodeID().isInInterval(impl.getID(),
-							info.getRange())) {
+		if (impl.transactionID > info.getTransaction()) {
+			// rebroadcast an alle Knoten innerhalb der Range
+			List<Node> fTable = impl.getFingerTable();
+			Collections.sort(fTable); // Wird hier nach ID sortiert? //Ja
+										// compareable in Node sortiert nach Ids
+			for (int i = 0; i <= fTable.size() - 1; i++) {
+				Node receiver = fTable.get(i);
+				if (!receiver.getNodeID().equals(impl.getID())
+						&& !receiver.getNodeID().equals(info.getRange())
+						&& receiver.getNodeID().isInInterval(impl.getID(),
+								info.getRange())) {
 
-				ID rng = i < (fTable.size() - 1) ? fTable.get(i + 1)
-						.getNodeID() : info.getRange();
-				// Muss transactionID geändert werden? // Ich glaube die wird nur von ChordImpl hochgez�hlt
-				Broadcast newInfo = new Broadcast(rng, info.getSource(),
-						info.getTarget(), info.getTransaction(), info.getHit());
-				
-				receiver.broadcast(newInfo);
+					ID rng = i < (fTable.size() - 1) ? fTable.get(i + 1)
+							.getNodeID() : info.getRange();
+					// Muss transactionID geändert werden? // Ich glaube die
+					// wird
+					// nur von ChordImpl hochgez�hlt
+					Broadcast newInfo = new Broadcast(rng, info.getSource(),
+							info.getTarget(), info.getTransaction(),
+							info.getHit());
+
+					impl.transactionID = info.getTransaction();
+					receiver.broadcast(newInfo);
+				}
 			}
 		}
 

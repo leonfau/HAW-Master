@@ -1107,7 +1107,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		return ChordRemoveFuture.create(this.asyncExecutor, this, key, entry);
 	}
 
-	private static int transactionID = 0;
+	public int transactionID = 0;
 
 	// TODO: implement this function in TTP
 	// TODO: Nicht getestet
@@ -1130,38 +1130,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 				e.printStackTrace();
 			}
 		}
-		transactionID++; //Hochz�hlen bei jedem neuen Broadcast zu Node oder am Ende? // Denke am Ende (nach der For schleife), da es sich um den gleichen Broadcast handelt, der an alle gesendet wird.
-		//zweite Version Ende
-		/**
-		int i = 0;
-		if (fTable.size() >= 1) {
-			while (fTable.size() >= 2 && i <= fTable.size() - 2) {
-				try {
-					// Der darauffolgende Eintrag in der Finger Tabelle ist die
-					// range
-					Broadcast info = new Broadcast(fTable.get(i + 1)
-							.getNodeID(), this.localNode.getNodeID(), target,
-							transactionID, hit);
-					fTable.get(i).broadcast(info);
-				} catch (CommunicationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				i++;
-			}
-			// Beim letzten Eintrag die eigene Node nehmen? oder den ersten
-			// Eintrag? oder ?
-			Broadcast info = new Broadcast(this.localNode.getNodeID(),
-					this.localNode.getNodeID(), target, transactionID, hit);
-			try {
-				fTable.get(i).broadcast(info);
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			transactionID++;
-		}
-		**/
+		transactionID++; //Hochz�hlen bei jedem neuen Broadcast zu Node oder am Ende?
 	}
 
 	public void setCallback(NotifyCallback callback) {
