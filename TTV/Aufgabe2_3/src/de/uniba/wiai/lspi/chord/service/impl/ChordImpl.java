@@ -1114,7 +1114,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 	// send broadcast to all nodes in finger table
 	@Override
 	public void broadcast(ID target, Boolean hit) {
-		System.out.println("BROADCAST");
+		System.out.println("Broadcast is sent that " + target + " was hit " + hit);
 		this.logger.debug("App called broadcast");
 		List<Node> fTable = getFingerTable();
 		Collections.sort(fTable); // Wird hier nach ID sortiert?

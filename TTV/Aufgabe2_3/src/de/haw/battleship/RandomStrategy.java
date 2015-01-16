@@ -29,35 +29,12 @@ public class RandomStrategy implements Strategy{
 		BigInteger intervall = IdMath.calculateFieldSize(state.getPlayerMinID(nextEnemy), nextEnemy, fieldCount);
 		r = ran.nextInt((fieldCount - 1) + 1)+1;
 		ID fieldID = IdMath.calcIDforField(state.getMyPlayerMin(), intervall, r);
-		while (state.getFieldState(fieldID) != null){            //Überprüfen ob bereits alle felder beschossen wurden --> anderen Spieler beschießen --> prüfen ob wann spiel vorbei ist  
+		while (state.getFieldState(fieldID) != FieldState.UNKNOWN){            //Überprüfen ob bereits alle felder beschossen wurden --> anderen Spieler beschießen --> prüfen ob wann spiel vorbei ist  
 			r = ran.nextInt((fieldCount - 1) + 1)+1;
 			fieldID = IdMath.calcIDforField(state.getMyPlayerMin(), intervall, r);
 		}
 		
 		return fieldID;
-		
-
-		
-/*		
-		List<ID> nodeIds = new ArrayList<ID>(enemyBoards.keySet());
-		nodeIds.add(chord.getID());
-		Collections.sort(nodeIds);
-		int preI = nodeIds.indexOf(chord.getPredecessorID());
-		ID pre = chord.getPredecessorID();
-		ID pre2 = nodeIds.get(preI-1);
-		
-				BigInteger local = chord.getPredecessorID().toBigInteger();
-				BigInteger rangeStart = chord.getID().toBigInteger();
-				if (rangeStart == null) {
-					rangeStart = BigInteger.ZERO;
-				}
-				rangeStart.add(BigInteger.ONE);
-				BigInteger intervalSize = local.subtract(rangeStart).divide(
-						new BigInteger(String.valueOf(100)));
-		
-
-		return new ID(chord.getPredecessorID().toBigInteger().subtract(intervalSize).subtract(intervalSize).toByteArray());
-		*/
 	}
 	
 	public void setShips(GameState gameState, BigInteger intervall){

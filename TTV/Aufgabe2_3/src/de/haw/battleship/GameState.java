@@ -1,5 +1,6 @@
 package de.haw.battleship;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,8 +94,12 @@ public class GameState {
 	 */
 	public ID findPossibleMinId(ID maxID){
 		ID newMinID = IdMath.zeroID();
+		BigInteger max = maxID.toBigInteger();
+		BigInteger newMin = BigInteger.ZERO;
+		
 		for(Entry<ID, ID> entry : player.entrySet()){
-			if(entry.getKey().compareTo(maxID) < 0 && entry.getKey().compareTo(newMinID) > 0){
+			BigInteger entryInt = entry.getKey().toBigInteger();
+			if(entryInt.compareTo(max) < 0 && entryInt.compareTo(newMin) > 0){
 				newMinID = IdMath.addOneToID(entry.getValue());
 			}
 		}

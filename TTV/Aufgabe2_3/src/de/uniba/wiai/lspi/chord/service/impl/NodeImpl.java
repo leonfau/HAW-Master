@@ -441,6 +441,7 @@ public final class NodeImpl extends Node {
 		}
 		if (impl.transactionID > info.getTransaction()) {
 			// rebroadcast an alle Knoten innerhalb der Range
+			
 			List<Node> fTable = impl.getFingerTable();
 			Collections.sort(fTable); // Wird hier nach ID sortiert? //Ja
 										// compareable in Node sortiert nach Ids

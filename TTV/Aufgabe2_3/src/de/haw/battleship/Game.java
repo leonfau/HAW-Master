@@ -3,12 +3,7 @@ package de.haw.battleship;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import de.uniba.wiai.lspi.chord.com.Node;
 import de.uniba.wiai.lspi.chord.data.ID;
@@ -28,18 +23,14 @@ public class Game {
 
 	private static final int I = 100;
 	private static final int S = 10;
-	private BigInteger intervalSize;
-	private BigInteger rangeStart;
 
 	public void init(String[] args) {
 		chord = createOrJoinChord(args);
 		
 		// Debug
-		System.out.println(chord.getID());
+		System.out.println("My own ID: " +chord.getID());
 		Report report = (Report) chord;
 		System.out.println(report.printFingerTable());
-
-
 
 		strategy = new RandomStrategy(S, I);
 	}
@@ -60,7 +51,6 @@ public class Game {
 	private boolean isBeginner() {
 		BigInteger maxID = new BigInteger("2").pow(160)
 				.subtract(BigInteger.ONE);
-		// TODO
 		return ID.valueOf(maxID).isInInterval(
 				ID.valueOf(chord.getPredecessorID().toBigInteger()
 						.add(BigInteger.ONE)), chord.getID());
@@ -82,10 +72,10 @@ public class Game {
 		
 		// check beginner
 		if (this.isBeginner()) {
-			System.out.println("is beginnger");
+			System.out.println("Node is the first Player!");
 			attack();
 		} else {
-			System.out.println("is not beginner");
+			System.out.println("Waiting for the first Player!");
 		}
 
 	}
@@ -119,12 +109,10 @@ public class Game {
 	}
 
 	private void attack() {
-		
-		//TODO an neues Datenmodell anpassen
-		System.out.println("attack");
-		ID Target = strategy.findNextTarget(gameState, chord);
+		ID target = strategy.findNextTarget(gameState, chord);
+		System.out.println("Firing on " + target);
 		try {
-			chord.retrieve(Target);
+			chord.retrieve(target);
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
@@ -132,17 +120,13 @@ public class Game {
 
 	public void updateInformation(ID source, ID target, Boolean hit) {
 		gameState.addPlayerIfNotExists(source);
-		System.out.println("update");
+		System.out.println("Updating "+ hit +" shot from " + source + " to " + target);
 		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
 	}
 
 	public void checkHit(ID target) {
-		System.out.println("check hit");
-		BigInteger field = target.toBigInteger().subtract(rangeStart)
-				.divide(intervalSize);
-		System.out.println(field);
-		
 		boolean hit = gameState.getFieldState(target) == FieldState.SHIP;
+		System.out.println("Checking if ship was hit with " + target + " Result: " + hit);
 		// Broadcast result
 		chord.broadcast(target, hit);
 		attack();
@@ -165,4 +149,41 @@ public class Game {
 
 	}
 
+	
+	/*
+	public static void main(String[] args) {
+		PropertiesLoader.loadPropertyFile();
+		
+		String[] args1 = new String[2];
+		args1[0] = "create";
+		args1[1] = "localhost:1500";
+		
+		String[] args2 = new String[3];
+		args2[0] = "join";
+		args2[1] = "localhost:1500";
+		args2[2] = "localhost:1501";
+		Game game1 = new Game();
+		game1.init(args1);
+		
+		Game game2 = new Game();
+		game2.init(args2);
+		System.out.println("Press key to start");
+		try {
+			System.in.read();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Game start");
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		game1.start();
+		game2.start();
+
+	}*/
+	
 }
