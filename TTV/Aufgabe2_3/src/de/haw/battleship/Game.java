@@ -57,7 +57,7 @@ public class Game {
 	}
 
 	private void start() {
-		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID());
+		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID(), I, S);
 		initOwnFields();
 		gameState.addPlayerIfNotExists(chord.getPredecessorID());
 		
