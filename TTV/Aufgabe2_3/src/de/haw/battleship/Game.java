@@ -40,7 +40,7 @@ public class Game {
 		// Schiffe setzen und Board initialisieren //TODO
 		ID aktuelPosition = gameState.getMyPlayerMin();
 		//init all fields with zero
-		while(aktuelPosition.compareTo(gameState.getMyPlayerMax()) <= 0){
+		while(IdMath.idCompare(aktuelPosition, gameState.getMyPlayerMax()) <= 0){
 			gameState.setState(aktuelPosition, FieldState.WATER);
 			IdMath.addToID(aktuelPosition, intervall);
 		}

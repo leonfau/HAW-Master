@@ -77,4 +77,14 @@ public class IdMath {
 			return new ID(intervall.multiply(BigInteger.valueOf(field)).add(startID.toBigInteger()).toByteArray());
 		}
 		
+
+
+		public static int idCompare(ID a, ID b){
+			if(a.getLength() == b.getLength()){
+				return a.compareTo(b);
+			}else{
+				return a.getLength() < b.getLength() ? -1 : 1;
+			}
+		}
+		
 }

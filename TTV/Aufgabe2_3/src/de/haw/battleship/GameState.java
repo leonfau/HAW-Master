@@ -76,7 +76,7 @@ public class GameState {
 				player.put(oldRange[1], IdMath.addOneToID(playerMax));
 				
 				//Min ID of existing player is smaller then new player --> min range of new player must be resized
-				if(oldRange[1].compareTo(playerMin) <= 0){
+				if(IdMath.idCompare(oldRange[1], playerMin) <= 0){
 					playerMin = oldRange[0];
 				}
 			}else if(IdMath.isInIntervallInkulsive(playerMin, oldRange[0], oldRange[1])){
@@ -135,7 +135,7 @@ public class GameState {
 	 */
 	public ID[] findPlayerForIDinRange(ID id){
 		for(Entry<ID, ID> entry: player.entrySet()){
-			if(entry.getKey().compareTo(id) <= 0 && entry.getValue().compareTo(id) >= 0){
+			if(IdMath.idCompare(entry.getKey(), id) <= 0 && IdMath.idCompare(entry.getValue(), id) >= 0){
 				return new ID[] {entry.getValue(), entry.getKey()};
 			}
 		}
