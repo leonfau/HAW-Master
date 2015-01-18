@@ -818,9 +818,11 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		if (debug) {
 			this.logger.debug("Retrieving entries with id " + id);
 		}
+		
 		Set<Entry> result = null;
 
 		boolean retrieved = false;
+		while (!retrieved) {
 			// find successor of id
 			Node responsibleNode = null;
 
@@ -840,7 +842,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 									+ "failed!", e1);
 				}
 			}
-		
+		}
 		Set<Serializable> values = new HashSet<Serializable>();
 
 		if (result != null) {

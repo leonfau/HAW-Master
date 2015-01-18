@@ -21,8 +21,8 @@ public class Game {
 	private GameState gameState;
 	Strategy strategy;
 
-	private static final int I = 100;
-	private static final int S = 10;
+	private static final int I = 10;
+	private static final int S = 3;
 
 	public void init(String[] args) {
 		chord = createOrJoinChord(args);
@@ -39,20 +39,14 @@ public class Game {
 		BigInteger intervall = IdMath.calculateFieldSize(gameState.getMyPlayerMin(), gameState.getMyPlayerMax(), I);
 
 		// Schiffe setzen und Board initialisieren
-		BigInteger startRange = gameState.getMyPlayerMin().toBigInteger();
-		BigInteger endRange = gameState.getMyPlayerMax().toBigInteger();
 		ID aktuelPosition = gameState.getMyPlayerMin();
 		ID lastPosition = gameState.getMyPlayerMax();
 		
-		if (startRange.min(endRange) == startRange) {
-			aktuelPosition = gameState.getMyPlayerMax();
-			lastPosition = gameState.getMyPlayerMin();
-		}
 		
 		//init all fields with zero
-		while(IdMath.idCompare(aktuelPosition, lastPosition) <= 0){
+		while(IdMath.idCompare(aktuelPosition, lastPosition) < 0){
 			gameState.setState(aktuelPosition, FieldState.WATER);
-			IdMath.addToID(aktuelPosition, intervall);
+			aktuelPosition = IdMath.addToID(aktuelPosition, intervall);
 		}
 		
 		strategy.setShips(gameState, intervall);
@@ -129,10 +123,24 @@ public class Game {
 		gameState.addPlayerIfNotExists(source);
 		System.out.println("Updating "+ hit +" shot to " + target);
 		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
+		
+		if (checkGameOver()) {
+			System.out.println("Game is Over: Last shot killed a Player");
+			try {
+				chord.leave();
+			} catch (ServiceException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
+	private boolean checkGameOver() {
+		return !gameState.findDeadPlayer().isEmpty();
+	}
+	
 	public void checkHit(ID target) {
-		boolean hit = gameState.getFieldState(target) == FieldState.SHIP;
+		boolean hit = gameState.checkForShip(target);
+		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
 		System.out.println("Checking if ship was hit with " + target + " Result: " + hit);
 		// Broadcast result
 		chord.broadcast(target, hit);

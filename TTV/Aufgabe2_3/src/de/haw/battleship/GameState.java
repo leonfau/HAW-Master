@@ -2,10 +2,12 @@ package de.haw.battleship;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 
 
 import de.uniba.wiai.lspi.chord.data.ID;
@@ -191,6 +193,25 @@ public class GameState {
 		return FieldState.UNKNOWN;
 	}
 
+	public boolean checkForShip(ID id) {
+		ID lastID = null;
+		List<ID> idList = new ArrayList<ID>();
+		idList.addAll(boardState.keySet());
+		Collections.sort(idList);
+		
+		for (ID e : idList) {
+			if (lastID != null) {
+
+				if (id.isInInterval(new ID(lastID.toBigInteger().add(BigInteger.ONE).toByteArray()), e)) {
+					return boardState.get(lastID) == FieldState.SHIP;
+				}
+			}
+			lastID = e;
+		}
+		
+		return boardState.get(id) == FieldState.SHIP;
+	}
+	
 	//Achtung, drei foreach Schleifen
 	public Map<ID, ID> findDeadPlayer() {
 		Map<ID, ID> deadPlayer = new HashMap<ID, ID>();

@@ -26,7 +26,7 @@ public class RandomStrategy implements Strategy{
 		ID nextEnemy = opponents.get(r);
 		//random field
 		BigInteger intervall = IdMath.calculateFieldSize(state.getPlayerMinID(nextEnemy), nextEnemy, fieldCount);
-		r = ran.nextInt((fieldCount - 1) + 1)+1;
+		r = ran.nextInt(fieldCount)+1;
 		ID fieldID = IdMath.calcIDforField(state.getPlayerMinID(nextEnemy), intervall, r);
 		
 		while (state.getFieldState(fieldID) != FieldState.UNKNOWN){            //Überprüfen ob bereits alle felder beschossen wurden --> anderen Spieler beschießen --> prüfen ob wann spiel vorbei ist  
@@ -48,6 +48,7 @@ public class RandomStrategy implements Strategy{
 						r = ran.nextInt((fieldCount - 1) + 1)+1;
 						shipID = IdMath.calcIDforField(gameState.getMyPlayerMin(), intervall, r);
 					}
+					System.out.println(shipID);
 					gameState.setState(shipID, FieldState.SHIP);		
 				}
 	}
