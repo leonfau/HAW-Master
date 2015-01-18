@@ -52,7 +52,6 @@ public class IdMath {
 		 * @return
 		 */
 		public static BigInteger calculateFieldSize(ID min, ID max, int fieldcount){
-			// TODO muss hier nochmal irgendwo +/-1 gerechnet werden?
 			return max.toBigInteger().subtract(min.toBigInteger()).divide(BigInteger.valueOf(fieldcount));
 		}
 		

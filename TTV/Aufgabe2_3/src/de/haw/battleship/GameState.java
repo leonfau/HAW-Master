@@ -117,6 +117,7 @@ public class GameState {
 				newMinID = IdMath.addOneToID(entry.getValue());
 			}
 		}
+		
 		return newMinID;
 	}
 

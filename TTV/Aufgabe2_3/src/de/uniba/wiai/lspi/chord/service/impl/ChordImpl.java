@@ -821,7 +821,6 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		Set<Entry> result = null;
 
 		boolean retrieved = false;
-		while (!retrieved) {
 			// find successor of id
 			Node responsibleNode = null;
 
@@ -840,9 +839,8 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 									+ " on the appropriate node! Retrieve operation "
 									+ "failed!", e1);
 				}
-				continue;
 			}
-		}
+		
 		Set<Serializable> values = new HashSet<Serializable>();
 
 		if (result != null) {

@@ -24,13 +24,11 @@ public class RandomStrategy implements Strategy{
 		//random opponent
 		int r = ran.nextInt((opponents.size()-1) + 1);
 		ID nextEnemy = opponents.get(r);
-		
 		//random field
 		BigInteger intervall = IdMath.calculateFieldSize(state.getPlayerMinID(nextEnemy), nextEnemy, fieldCount);
 		r = ran.nextInt((fieldCount - 1) + 1)+1;
-		
-		
 		ID fieldID = IdMath.calcIDforField(state.getPlayerMinID(nextEnemy), intervall, r);
+		
 		while (state.getFieldState(fieldID) != FieldState.UNKNOWN){            //Überprüfen ob bereits alle felder beschossen wurden --> anderen Spieler beschießen --> prüfen ob wann spiel vorbei ist  
 			r = ran.nextInt((fieldCount - 1) + 1)+1;
 			fieldID = IdMath.calcIDforField(state.getPlayerMinID(nextEnemy), intervall, r);
