@@ -33,12 +33,7 @@ public class RandomStrategy implements Strategy{
 			r = ran.nextInt((fieldCount - 1) + 1)+1;
 			fieldID = IdMath.calcIDforField(state.getPlayerMinID(nextEnemy), intervall, r);
 		}
-		System.out.println("--------------------------------");
-		System.out.println(state.getPlayerMinID(nextEnemy));
-		System.out.println(nextEnemy);
-		
-		System.out.println(fieldID);
-		System.out.println("--------------------------------");
+
 		return fieldID;
 	}
 	

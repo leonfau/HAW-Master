@@ -74,7 +74,6 @@ public class GameState {
 	 * @param playerMax
 	 */
 	public void addPlayer(ID playerMin, ID playerMax) {
-
 		// update existing player
 		ID[] oldRange = this.findPlayerForIDinRange(playerMax);
 		// existing player must be updated
@@ -107,19 +106,28 @@ public class GameState {
 	 * @return
 	 */
 	public ID findPossibleMinId(ID maxID) {
-		ID newMinID = IdMath.zeroID();
-		BigInteger max = maxID.toBigInteger();
-		BigInteger newMin = BigInteger.ZERO;
+		  BigInteger max = maxID.toBigInteger();
+		  BigInteger newMin = BigInteger.ZERO;
+		  BigInteger firstFieldStart = BigInteger.ZERO;
 
-		for (Entry<ID, ID> entry : player.entrySet()) {
-			BigInteger entryInt = entry.getKey().toBigInteger();
-			if (entryInt.compareTo(max) < 0 && entryInt.compareTo(newMin) > 0) {
-				newMinID = IdMath.addOneToID(entry.getValue());
-			}
-		}
-		
-		return newMinID;
-	}
+
+		  for (Entry<ID, ID> entry : player.entrySet()) {
+		   if(firstFieldStart.equals(BigInteger.ZERO) || firstFieldStart.compareTo(entry.getKey().toBigInteger()) < 0){
+		    firstFieldStart = firstFieldStart.max(entry.getKey().toBigInteger());
+		   }
+
+		   BigInteger entryInt = entry.getKey().toBigInteger();
+		   if (entryInt.compareTo(max) < 0 && entryInt.compareTo(newMin) > 0) {
+		    newMin = IdMath.addOneToID(entry.getValue()).toBigInteger();
+		   }
+		  }
+		  
+		  //Range in circle over Zero boarder
+		  if(newMin.equals(BigInteger.ZERO)){
+		   newMin = firstFieldStart.subtract(BigInteger.ONE);
+		  }
+		  return new ID(newMin.toByteArray());
+		 }
 
 	/**
 	 * add player if not exists

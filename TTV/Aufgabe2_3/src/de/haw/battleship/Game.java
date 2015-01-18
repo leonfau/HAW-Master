@@ -74,7 +74,6 @@ public class Game {
 		ChordImpl c = (ChordImpl) chord;
 		List<Node> fTable = c.getFingerTable();
 		for (Node n : fTable) {
-			System.out.println("added " + n.getNodeID());
 			gameState.addPlayerIfNotExists(n.getNodeID());
 		}
 		//vll noch etwas über n.findSuccessor(id) machen
@@ -117,7 +116,6 @@ public class Game {
 	}
 
 	private void attack() {
-		System.out.println("attack");
 		ID target = strategy.findNextTarget(gameState, chord);
 		System.out.println("Firing on " + target);
 		try {

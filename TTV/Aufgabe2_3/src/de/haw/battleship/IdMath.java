@@ -52,7 +52,11 @@ public class IdMath {
 		 * @return
 		 */
 		public static BigInteger calculateFieldSize(ID min, ID max, int fieldcount){
-			return max.toBigInteger().subtract(min.toBigInteger()).divide(BigInteger.valueOf(fieldcount));
+			if (min.toBigInteger().min(max.toBigInteger()).equals(min.toBigInteger())) {
+				return max.toBigInteger().subtract(min.toBigInteger()).divide(BigInteger.valueOf(fieldcount));
+			} else {
+				return min.toBigInteger().subtract(max.toBigInteger()).divide(BigInteger.valueOf(fieldcount));
+			}
 		}
 		
 		/**
