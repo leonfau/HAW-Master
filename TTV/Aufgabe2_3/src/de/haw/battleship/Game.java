@@ -37,10 +37,20 @@ public class Game {
 	
 	private void initOwnFields(){
 		BigInteger intervall = IdMath.calculateFieldSize(gameState.getMyPlayerMin(), gameState.getMyPlayerMax(), I);
-		// Schiffe setzen und Board initialisieren //TODO
+
+		// Schiffe setzen und Board initialisieren
+		BigInteger startRange = gameState.getMyPlayerMin().toBigInteger();
+		BigInteger endRange = gameState.getMyPlayerMax().toBigInteger();
 		ID aktuelPosition = gameState.getMyPlayerMin();
+		ID lastPosition = gameState.getMyPlayerMax();
+		
+		if (startRange.min(endRange) == startRange) {
+			aktuelPosition = gameState.getMyPlayerMax();
+			lastPosition = gameState.getMyPlayerMin();
+		}
+		
 		//init all fields with zero
-		while(IdMath.idCompare(aktuelPosition, gameState.getMyPlayerMax()) <= 0){
+		while(IdMath.idCompare(aktuelPosition, lastPosition) <= 0){
 			gameState.setState(aktuelPosition, FieldState.WATER);
 			IdMath.addToID(aktuelPosition, intervall);
 		}
@@ -60,7 +70,6 @@ public class Game {
 		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID(), I, S);
 		initOwnFields();
 		gameState.addPlayerIfNotExists(chord.getPredecessorID());
-		
 		//Init player in fingerTable
 		ChordImpl c = (ChordImpl) chord;
 		List<Node> fTable = c.getFingerTable();
@@ -68,7 +77,6 @@ public class Game {
 			gameState.addPlayerIfNotExists(n.getNodeID());
 		}
 		//vll noch etwas über n.findSuccessor(id) machen
-		
 		
 		// check beginner
 		if (this.isBeginner()) {
@@ -120,7 +128,7 @@ public class Game {
 
 	public void updateInformation(ID source, ID target, Boolean hit) {
 		gameState.addPlayerIfNotExists(source);
-		System.out.println("Updating "+ hit +" shot from " + source + " to " + target);
+		System.out.println("Updating "+ hit +" shot to " + target);
 		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
 	}
 

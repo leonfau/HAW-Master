@@ -67,6 +67,16 @@ public class IdMath {
 		}
 		
 		/**
+		 * subtract given value from id
+		 * @param id
+		 * @param value
+		 * @return
+		 */
+		public static ID subtractFromID(ID id, BigInteger value){
+			return new ID(id.toBigInteger().subtract(value).toByteArray());
+		}
+		
+		/**
 		 * caluculate ID for field
 		 * @param startID
 		 * @param intervall

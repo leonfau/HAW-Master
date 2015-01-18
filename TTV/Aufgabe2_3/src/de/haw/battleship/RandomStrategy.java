@@ -38,6 +38,7 @@ public class RandomStrategy implements Strategy{
 		System.out.println("--------------------------------");
 		System.out.println(state.getPlayerMinID(nextEnemy));
 		System.out.println(nextEnemy);
+		
 		System.out.println(fieldID);
 		System.out.println("--------------------------------");
 		return fieldID;
