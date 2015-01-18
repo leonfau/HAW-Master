@@ -1,3 +1,11 @@
+/**
+ * Technik & Technologie vernetzter Systeme
+ * Teil 2: P2P-Kommunikation: Chord mit Broadcast (3. & 4. Praktikum)
+ * Projekt: Implementierung eines verteilten Spiels "Schiffe Versenken" (ohne Churn).
+ * 
+ * @author Erwin Lang, Leon Fausten
+ *
+ */
 package de.haw.battleship;
 
 import java.math.BigInteger;
@@ -36,7 +44,7 @@ public class RandomStrategy implements Strategy{
 
 		return fieldID;
 	}
-	
+	@Override
 	public void setShips(GameState gameState, BigInteger intervall){
 		//set ships
 				for(int i = 0; i < shipCount; i++){

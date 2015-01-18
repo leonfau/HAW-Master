@@ -1,9 +1,20 @@
+/**
+ * Technik & Technologie vernetzter Systeme
+ * Teil 2: P2P-Kommunikation: Chord mit Broadcast (3. & 4. Praktikum)
+ * Projekt: Implementierung eines verteilten Spiels "Schiffe Versenken" (ohne Churn).
+ * 
+ * @author Erwin Lang, Leon Fausten
+ *
+ */
 package de.haw.battleship;
 
 import java.math.BigInteger;
 
 import de.uniba.wiai.lspi.chord.data.ID;
-
+/**
+ * Helper class for calculations with IDs
+ *
+ */
 public class IdMath {
 	//**************************HELPER*******************************//
 		/**
@@ -91,7 +102,12 @@ public class IdMath {
 		}
 		
 
-
+		/**
+		 * Compare IDs with different length
+		 * @param a
+		 * @param b
+		 * @return
+		 */
 		public static int idCompare(ID a, ID b){
 			if(a.getLength() == b.getLength()){
 				return a.compareTo(b);

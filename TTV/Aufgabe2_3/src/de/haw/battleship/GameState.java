@@ -1,3 +1,11 @@
+/**
+ * Technik & Technologie vernetzter Systeme
+ * Teil 2: P2P-Kommunikation: Chord mit Broadcast (3. & 4. Praktikum)
+ * Projekt: Implementierung eines verteilten Spiels "Schiffe Versenken" (ohne Churn).
+ * 
+ * @author Erwin Lang, Leon Fausten
+ *
+ */
 package de.haw.battleship;
 
 import java.math.BigInteger;
@@ -7,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-
 
 import de.uniba.wiai.lspi.chord.data.ID;
 
@@ -38,26 +44,22 @@ public class GameState {
 
 	}
 
+	/**
+	 * Returns own player min id
+	 */
 	public ID getMyPlayerMin() {
 		return myPlayerMin;
 	}
 
-	public void setMyPlayerMin(ID myPlayerMin) {
-		this.myPlayerMin = myPlayerMin;
-	}
-
+	/**
+	 * Returns own player max id
+	 */
 	public ID getMyPlayerMax() {
 		return myPlayerMax;
 	}
 
-	public void setMyPlayerMax(ID myPlayerMax) {
-		this.myPlayerMax = myPlayerMax;
-	}
-
 	/**
 	 * Return opponents map
-	 * 
-	 * @return
 	 */
 	public List<ID> getOpponents() {
 		List<ID> opponents = new ArrayList<ID>(player.keySet());
@@ -65,12 +67,18 @@ public class GameState {
 		return opponents;
 	}
 
+	/**
+	 * Find min id for given player
+	 * 
+	 * @param maxID
+	 * @return minID
+	 */
 	public ID getPlayerMinID(ID maxID) {
 		return player.get(maxID);
 	}
 
 	/**
-	 * add new player and update min ranges if necessary
+	 * Add new player and update min ranges if necessary
 	 * 
 	 * @param playerMin
 	 * @param playerMax
@@ -108,28 +116,29 @@ public class GameState {
 	 * @return
 	 */
 	public ID findPossibleMinId(ID maxID) {
-		  BigInteger max = maxID.toBigInteger();
-		  BigInteger newMin = BigInteger.ZERO;
-		  BigInteger firstFieldStart = BigInteger.ZERO;
+		BigInteger max = maxID.toBigInteger();
+		BigInteger newMin = BigInteger.ZERO;
+		BigInteger firstFieldStart = BigInteger.ZERO;
 
+		for (Entry<ID, ID> entry : player.entrySet()) {
+			if (firstFieldStart.equals(BigInteger.ZERO)
+					|| firstFieldStart.compareTo(entry.getKey().toBigInteger()) < 0) {
+				firstFieldStart = firstFieldStart.max(entry.getKey()
+						.toBigInteger());
+			}
 
-		  for (Entry<ID, ID> entry : player.entrySet()) {
-		   if(firstFieldStart.equals(BigInteger.ZERO) || firstFieldStart.compareTo(entry.getKey().toBigInteger()) < 0){
-		    firstFieldStart = firstFieldStart.max(entry.getKey().toBigInteger());
-		   }
+			BigInteger entryInt = entry.getKey().toBigInteger();
+			if (entryInt.compareTo(max) < 0 && entryInt.compareTo(newMin) > 0) {
+				newMin = IdMath.addOneToID(entry.getValue()).toBigInteger();
+			}
+		}
 
-		   BigInteger entryInt = entry.getKey().toBigInteger();
-		   if (entryInt.compareTo(max) < 0 && entryInt.compareTo(newMin) > 0) {
-		    newMin = IdMath.addOneToID(entry.getValue()).toBigInteger();
-		   }
-		  }
-		  
-		  //Range in circle over Zero boarder
-		  if(newMin.equals(BigInteger.ZERO)){
-		   newMin = firstFieldStart.subtract(BigInteger.ONE);
-		  }
-		  return new ID(newMin.toByteArray());
-		 }
+		// Range in circle over Zero boarder
+		if (newMin.equals(BigInteger.ZERO)) {
+			newMin = firstFieldStart.subtract(BigInteger.ONE);
+		}
+		return new ID(newMin.toByteArray());
+	}
 
 	/**
 	 * add player if not exists
@@ -182,10 +191,22 @@ public class GameState {
 		return player.get(id);
 	}
 
+	/**
+	 * Set state of specific field
+	 * 
+	 * @param id
+	 * @param state
+	 */
 	public void setState(ID id, FieldState state) {
 		boardState.put(id, state);
 	}
 
+	/**
+	 * Get state of specific field
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public FieldState getFieldState(ID id) {
 		if (boardState.get(id) != null) {
 			return boardState.get(id);
@@ -193,26 +214,38 @@ public class GameState {
 		return FieldState.UNKNOWN;
 	}
 
+	/**
+	 * check if given id is in range from ship
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public boolean checkForShip(ID id) {
 		ID lastID = null;
 		List<ID> idList = new ArrayList<ID>();
 		idList.addAll(boardState.keySet());
 		Collections.sort(idList);
-		
+
 		for (ID e : idList) {
 			if (lastID != null) {
 
-				if (id.isInInterval(new ID(lastID.toBigInteger().add(BigInteger.ONE).toByteArray()), e)) {
+				if (id.isInInterval(
+						new ID(lastID.toBigInteger().add(BigInteger.ONE)
+								.toByteArray()), e)) {
 					return boardState.get(lastID) == FieldState.SHIP;
 				}
 			}
 			lastID = e;
 		}
-		
+
 		return boardState.get(id) == FieldState.SHIP;
 	}
-	
-	//Achtung, drei foreach Schleifen
+
+	/**
+	 * find all dead player
+	 * 
+	 * @return
+	 */
 	public Map<ID, ID> findDeadPlayer() {
 		Map<ID, ID> deadPlayer = new HashMap<ID, ID>();
 
@@ -224,20 +257,32 @@ public class GameState {
 		return deadPlayer;
 	}
 
+	/**
+	 * check if single player is dead
+	 * 
+	 * @param player
+	 * @return
+	 */
 	public boolean isDead(Entry<ID, ID> player) {
 		Map<ID, FieldState> playerField = this.getPlayerField(player);
 		int hitCount = 0;
-		for(Entry<ID, FieldState> field: playerField.entrySet()){
-			if(field.getValue() == FieldState.HIT)
+		for (Entry<ID, FieldState> field : playerField.entrySet()) {
+			if (field.getValue() == FieldState.HIT)
 				hitCount++;
 		}
 		return hitCount >= S;
 	}
 
+	/**
+	 * return field of single player
+	 * @param player
+	 * @return
+	 */
 	public Map<ID, FieldState> getPlayerField(Entry<ID, ID> player) {
 		Map<ID, FieldState> playerField = new HashMap<ID, FieldState>();
-		for(Entry<ID, FieldState> field: boardState.entrySet()){
-			if(IdMath.isInIntervallInkulsive(field.getKey(), player.getValue(), player.getKey())){
+		for (Entry<ID, FieldState> field : boardState.entrySet()) {
+			if (IdMath.isInIntervallInkulsive(field.getKey(),
+					player.getValue(), player.getKey())) {
 				playerField.put(field.getKey(), field.getValue());
 			}
 		}
