@@ -93,7 +93,7 @@ public class Game {
 	}
 
 	/**
-	 * Check if we are beginner
+	 * Check if we are the first player
 	 * @return
 	 */
 	private boolean isBeginner() {
@@ -109,7 +109,7 @@ public class Game {
 	 * starts the game
 	 */
 	private void start() {
-		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID(), I, S);
+		gameState = new GameState(IdMath.addOneToID(chord.getPredecessorID()), chord.getID(), S);
 		initOwnFields();
 		//add own predecessor 
 		gameState.addPlayerIfNotExists(chord.getPredecessorID());

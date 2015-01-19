@@ -15,6 +15,10 @@ import java.util.Random;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 
+/**
+ * 
+ * Strategy for the game. Tries to find unknown fields and shoots them randomly.
+ */
 public class RandomStrategy implements Strategy{
 	
 	private int shipCount;

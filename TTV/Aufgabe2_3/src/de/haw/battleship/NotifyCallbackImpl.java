@@ -13,6 +13,10 @@ import java.util.logging.Logger;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 
+/**
+ * 
+ *Interface between OpenChord and the game
+ */
 public class NotifyCallbackImpl implements NotifyCallback {
 
 	Game game;

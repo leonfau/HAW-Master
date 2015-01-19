@@ -30,16 +30,14 @@ public class GameState {
 
 	private ID myPlayerMin;
 	private ID myPlayerMax;
-	private int I;
 	private int S;
 
-	public GameState(ID myPlayerMin, ID myPlayerMax, int I, int S) {
+	public GameState(ID myPlayerMin, ID myPlayerMax, int S) {
 		this.myPlayerMax = myPlayerMax;
 		this.myPlayerMin = myPlayerMin;
 		boardState = new HashMap<ID, FieldState>();
 		player = new HashMap<ID, ID>();
 		player.put(myPlayerMax, myPlayerMin);
-		this.I = I;
 		this.S = S;
 
 	}
