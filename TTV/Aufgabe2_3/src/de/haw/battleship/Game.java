@@ -43,6 +43,8 @@ public class Game {
 	 */
 	private static final int S = 3;
 
+	private int hit = 0;
+	
 	/**
 	 * Initialization of chord network and strategy
 	 * 
@@ -69,13 +71,14 @@ public class Game {
 
 		// Schiffe setzen und Board initialisieren
 		ID actualPosition = gameState.getMyPlayerMin();
-		ID lastPosition = gameState.getMyPlayerMax();
-		
-		
+
 		//init all fields with zero
-		while(IdMath.idCompare(actualPosition, lastPosition) < 0){
+		int i = 0;
+		while(i < I){
+			System.out.println("Field: " + actualPosition);
 			gameState.setState(actualPosition, FieldState.WATER);
 			actualPosition = IdMath.addToID(actualPosition, intervall);
+			i++;
 		}
 		
 		strategy.setShips(gameState, intervall);
@@ -183,14 +186,7 @@ public class Game {
 		System.out.println("Updating "+ hit +" shot to " + target);
 		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
 		
-		if (checkGameOver()) {
-			System.out.println("Game is Over: Last shot killed a Player");
-			try {
-				chord.leave();
-			} catch (ServiceException e) {
-				e.printStackTrace();
-			}
-		}
+		checkGameOver();
 	}
 
 	/**
@@ -198,7 +194,17 @@ public class Game {
 	 * @return
 	 */
 	private boolean checkGameOver() {
-		return !gameState.findDeadPlayer().isEmpty();
+		if (!gameState.findDeadPlayer().isEmpty() || hit == S) {
+			System.out.println("Game is Over: Last shot killed a Player");
+			try {
+				Thread.sleep(5000);
+				//chord.leave();
+				return true;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -207,11 +213,11 @@ public class Game {
 	 */
 	public void checkHit(ID target) {
 		boolean hit = gameState.checkForShip(target);
-		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
+		if (hit) this.hit++;
 		System.out.println("Checking if ship was hit with " + target + " Result: " + hit);
 		// Broadcast result
 		chord.broadcast(target, hit);
-		attack();
+		if (!checkGameOver()) attack();
 	}
 
 	// create localhost:1500

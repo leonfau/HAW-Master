@@ -202,6 +202,43 @@ public class GameState {
 	}
 
 	/**
+	 * Set state of specific field that is higher than the id
+	 * 
+	 * @param id
+	 * @param state
+	 */
+	public void setForNextState(ID id, FieldState state) {
+		List<ID> states = new ArrayList<ID>();
+		states.addAll(boardState.keySet());
+		Collections.sort(states);
+		
+		for (ID knownID : states) {
+			if (knownID.compareTo(id) >= 0) {
+				boardState.put(knownID, state);
+				return;
+			}
+		}
+	}
+	
+	/**
+	 * Finds the upper boarder ID of the field
+	 * @param id
+	 * @return
+	 */
+	public ID getNextHigherID(ID id) {
+		List<ID> states = new ArrayList<ID>();
+		states.addAll(boardState.keySet());
+		Collections.sort(states);
+		
+		for (ID knownID : states) {
+			if (knownID.compareTo(id) >= 0) {
+				return knownID;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Get state of specific field
 	 * 
 	 * @param id
