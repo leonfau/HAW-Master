@@ -41,9 +41,17 @@ public class Game {
 	/**
 	 * Ship count
 	 */
-	private static final int S = 3;
+	private static final int S = 5;
 
+	/**
+	 * Hit count for own ships
+	 */
 	private int hit = 0;
+	
+	/**
+	 * Game is over
+	 */
+	private boolean gameover = false;
 	
 	/**
 	 * Initialization of chord network and strategy
@@ -186,20 +194,30 @@ public class Game {
 		System.out.println("Updating "+ hit +" shot to " + target);
 		gameState.setState(target, hit ? FieldState.HIT : FieldState.WATER);
 		
-		checkGameOver();
+		checkGameOver(target);
 	}
 
 	/**
 	 * Check if game is over
 	 * @return
 	 */
-	private boolean checkGameOver() {
-		if (!gameState.findDeadPlayer().isEmpty() || hit == S) {
-			System.out.println("Game is Over: Last shot killed a Player");
+	private boolean checkGameOver(ID target) {
+		if (!gameover) {
 			try {
+				if (hit == S) {
+					System.out.println("Game is Over: We Lost :(");
+					gameover = true;
+					Thread.sleep(5000);
+					//chord.leave();
+					return true;
+				} else
+			if (!gameState.findDeadPlayer().isEmpty() ) {
+				System.out.println("Game is Over: Last shot at " + target + "killed a Player");
+				gameover = true;
 				Thread.sleep(5000);
 				//chord.leave();
 				return true;
+			}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -217,7 +235,7 @@ public class Game {
 		System.out.println("Checking if ship was hit with " + target + " Result: " + hit);
 		// Broadcast result
 		chord.broadcast(target, hit);
-		if (!checkGameOver()) attack();
+		if (!checkGameOver(target)) attack();
 	}
 
 	// create localhost:1500

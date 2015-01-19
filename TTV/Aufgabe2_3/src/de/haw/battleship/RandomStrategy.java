@@ -56,7 +56,7 @@ public class RandomStrategy implements Strategy{
 						r = ran.nextInt((fieldCount - 1) + 1)+1;
 						shipID = IdMath.calcIDforField(gameState.getMyPlayerMin(), intervall, r);
 					}
-					System.out.println(shipID);
+					System.out.println("Ship: " +shipID);
 					gameState.setState(shipID, FieldState.SHIP);		
 				}
 	}
