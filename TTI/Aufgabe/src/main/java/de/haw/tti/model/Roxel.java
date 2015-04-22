@@ -6,7 +6,6 @@ import com.gigaspaces.annotation.pojo.SpaceId;
 @SpaceClass
 public class Roxel {
 
-	private Integer uid;
     private Integer length; 
     private Integer x; 
     private Integer y;
@@ -16,9 +15,8 @@ public class Roxel {
     //default constructor, required
     public Roxel() {}
 
-	public Roxel(Integer uid, Integer length, Integer x, Integer y, Direction direction) {
+	public Roxel(Integer length, Integer x, Integer y, Direction direction) {
 		super();
-		this.uid = uid;
 		this.length = length;
 		this.x = x;
 		this.y = y;
@@ -27,12 +25,8 @@ public class Roxel {
 	}
 
 	@SpaceId
-	public Integer getUid() {
-		return uid;
-	}
-
-	public void setUid(Integer uid) {
-		this.uid = uid;
+	public String getUid() {
+		return String.valueOf(x) + String.valueOf(y);
 	}
 
 	public Integer getLength() {
