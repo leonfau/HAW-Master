@@ -2,18 +2,21 @@ package de.haw.tti.model;
 
 import com.gigaspaces.annotation.pojo.SpaceClass;
 import com.gigaspaces.annotation.pojo.SpaceId;
+import com.gigaspaces.annotation.pojo.SpaceProperty;
 
 @SpaceClass
 public class Roxel {
 
-    private Integer length; 
-    private Integer x; 
-    private Integer y;
-    private Car occupiedBy;
-    private Direction direction;
-    
-    //default constructor, required
-    public Roxel() {}
+	private Integer length;
+	private Integer x;
+	private Integer y;
+	private Car occupiedBy;
+	private Direction direction;
+	private String id;
+
+	// default constructor, required
+	public Roxel() {
+	}
 
 	public Roxel(Integer length, Integer x, Integer y, Direction direction) {
 		super();
@@ -21,14 +24,24 @@ public class Roxel {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
-		this.occupiedBy = new EmptyCar();
+		this.occupiedBy =  EmptyCar.getInstance();
 	}
 
-	@SpaceId
-	public String getUid() {
-		return String.valueOf(x) + String.valueOf(y);
+	// @SpaceId
+	// public String getUid() {
+	// return String.valueOf(x) + String.valueOf(y);
+	// }
+
+	@SpaceId(autoGenerate = true)
+	public String getId() {
+		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@SpaceProperty
 	public Integer getLength() {
 		return length;
 	}
@@ -37,6 +50,7 @@ public class Roxel {
 		this.length = length;
 	}
 
+	@SpaceProperty
 	public Integer getX() {
 		return x;
 	}
@@ -44,7 +58,8 @@ public class Roxel {
 	public void setX(Integer x) {
 		this.x = x;
 	}
-
+	
+	@SpaceProperty
 	public Integer getY() {
 		return y;
 	}
@@ -53,6 +68,7 @@ public class Roxel {
 		this.y = y;
 	}
 
+	@SpaceProperty
 	public Car getOccupiedBy() {
 		return occupiedBy;
 	}
@@ -61,12 +77,13 @@ public class Roxel {
 		this.occupiedBy = occupiedBy;
 	}
 
+	@SpaceProperty
 	public Direction getDirection() {
 		return direction;
 	}
 
 	public void setDirection(Direction direction) {
 		this.direction = direction;
-	} 
+	}
 
 }

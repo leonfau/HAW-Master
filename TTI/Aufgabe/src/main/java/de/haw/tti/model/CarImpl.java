@@ -1,49 +1,64 @@
 package de.haw.tti.model;
 
 import com.gigaspaces.annotation.pojo.SpaceClass;
+import com.gigaspaces.annotation.pojo.SpaceProperty;
+
+import de.haw.tti.controller.GigaSpaceStreetMap;
+import de.haw.tti.controller.StreetMap;
 
 @SpaceClass
 public class CarImpl implements Car, Runnable {
 
-	//default constructor, required
-	public CarImpl() {}
+	private Direction direction;
+	StreetMap spa;
+	int initX;
+	int initY;
+
+	// default constructor, required
+	public CarImpl(Direction dir, int initX, int initY) {
+		this.direction = dir;
+		spa = new GigaSpaceStreetMap("/./streetMap");
+		this.initX = initX;
+		this.initY = initY;
+	}
+	@SpaceProperty
+	public Direction getDirection(){
+		return direction;
+	}
 
 	@Override
 	public void run() {
-		Roxel currentRoxel = enterInitialRoxel();
-		
-		while (wantToMoveForward()){
-			moveThroughCurrRoxel();
-			moveToNextRoxel(getNextRoxel());
-			
-			// write back as occupied (allows monitoring),
-			// write previous roxel back indicated empty
+		Roxel currentRoxel = enterInitialRoxel(initX, initY);
+
+		while (wantToMoveForward()) {
+			moveThroughCurrRoxel(currentRoxel);
+			currentRoxel = moveToNextRoxel(currentRoxel);
 		}
 	}
-		
-	private Roxel enterInitialRoxel() {
-		//TODO
-		return null;
+	@SpaceProperty
+	public boolean isEmpty() {
+		return false;
 	}
-	
+
+	private Roxel enterInitialRoxel(int x, int y) {
+		Roxel r = spa.takeByCoordinate(x, y, this);
+		return r;
+	}
+
 	private boolean wantToMoveForward() {
 		return true;
 	}
-	
-	private void moveThroughCurrRoxel() {
+
+	private void moveThroughCurrRoxel(Roxel current) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(10 * current.getLength());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private Roxel getNextRoxel() {
-		//TODO
-		return null;
+
+	private Roxel moveToNextRoxel(Roxel current) {
+		return spa.takeNextRoxel(current, direction);
 	}
-	
-	private void moveToNextRoxel(Roxel roxel) {
-		
-	}
+
 }

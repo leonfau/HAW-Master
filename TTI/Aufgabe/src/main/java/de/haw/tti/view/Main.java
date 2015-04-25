@@ -5,51 +5,120 @@ import java.util.logging.Logger;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import de.haw.tti.controller.SpaceInitiator;
+import de.haw.tti.controller.GigaSpaceStreetMap;
+import de.haw.tti.controller.StreetMap;
+import de.haw.tti.model.Car;
+import de.haw.tti.model.CarImpl;
+import de.haw.tti.model.Direction;
+import de.haw.tti.model.Roxel;
 
 public class Main extends BasicGame {
+	StreetMap spa;
+	private Roxel[] map;
 
-	public Main(String title)
-	{
+	public Main(String title) {
 		super(title);
+		spa = new GigaSpaceStreetMap("/./streetMap");
+		spa.createSpaceMap();
 	}
 
 	@Override
 	public void init(GameContainer gc) throws SlickException {
-		SpaceInitiator.createSpace();
+		map = spa.fetchFullMap();
+
+		Car car = new CarImpl(Direction.EAST, 0, 1);
+		(new Thread((CarImpl) car)).start();
+		Car car2 = new CarImpl(Direction.EAST, 0, 3);
+		(new Thread((CarImpl) car2)).start();
+		Car car5 = new CarImpl(Direction.EAST, 0, 5);
+		(new Thread((CarImpl) car5)).start();
+		
+		Car car3 = new CarImpl(Direction.SOUTH, 1, 0);
+		(new Thread((CarImpl) car3)).start();
+		Car car4 = new CarImpl(Direction.SOUTH, 3, 3);
+		(new Thread((CarImpl) car4)).start();
+		Car car6 = new CarImpl(Direction.SOUTH, 5, 0);
+		(new Thread((CarImpl) car6)).start();
+		
+		Car car7 = new CarImpl(Direction.SOUTH, 1, 0);
+		(new Thread((CarImpl) car7)).start();
+		Car car8 = new CarImpl(Direction.SOUTH, 3, 3);
+		(new Thread((CarImpl) car8)).start();
+		Car car9 = new CarImpl(Direction.SOUTH, 5, 0);
+		(new Thread((CarImpl) car9)).start();
 	}
 
 	@Override
 	public void update(GameContainer gc, int i) throws SlickException {
-		//TODO Call logic
-		
+		// TODO Call logic
+
 	}
 
-	
-	public void render(GameContainer gc, Graphics g) throws SlickException
-	{
-		//TODO Render Streets
-		g.setBackground(new Color(20,150,20));
-		
+	private void drawMap() throws SlickException {
+		for (int i = 0; i < map.length; i++) {
+			double size = map[i].getLength();
+			double xCoord = map[i].getX() * size;
+			double yCoord = map[i].getY() * size;
+			Image img = null;
+			if (!map[i].getOccupiedBy().isEmpty()) {
+				img = new Image("assets/car.png");
+				
+				switch (((CarImpl) map[i].getOccupiedBy()).getDirection()) {
+
+				case SOUTH:
+					img.setRotation(90);
+					break;
+				default:
+					break;
+				}
+				
+			} else {
+				switch (map[i].getDirection()) {
+				case BLOCKED:
+					img = new Image("assets/blocked.png");
+					break;
+				case SOUTH:
+					img = new Image("assets/street.png");
+					img.setRotation(90);
+					break;
+				case EAST:
+					img = new Image("assets/street.png");
+					break;
+				case TODECIDE:
+					img = new Image("assets/todecide.png");
+					break;
+				default:
+					break;
+				}
+			}
+			if (img != null) {
+				img.draw(new Float(xCoord), new Float(yCoord));
+			}
+		}
 	}
 
-	public static void main(String[] args)
-	{
-		try
-		{
+	public void render(GameContainer gc, Graphics g) throws SlickException {
+		// @TODO: nur noch in init, nur noch autos abfragen
+		 map = spa.fetchFullMap();
+		// Roxel[] cars = spa.fetchCars();
+		
+		this.drawMap();
+
+	}
+
+	public static void main(String[] args) {
+		try {
 			AppGameContainer appgc;
 			appgc = new AppGameContainer(new Main("TTI Praktikum"));
-			appgc.setDisplayMode(800, 600, false);
+			appgc.setDisplayMode(700, 700, false);
 			appgc.setShowFPS(false);
 			appgc.start();
-		}
-		catch (SlickException ex)
-		{
+		} catch (SlickException ex) {
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}

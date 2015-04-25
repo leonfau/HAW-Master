@@ -4,17 +4,20 @@ import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
 import org.openspaces.core.space.UrlSpaceConfigurer;
 
+import de.haw.tti.model.Car;
 import de.haw.tti.model.Direction;
+import de.haw.tti.model.EmptyCar;
 import de.haw.tti.model.Roxel;
 
 public class GigaSpaceStreetMap implements StreetMap {
 
 	private GigaSpace space;
+	private final int MAX_BLOCK = 5000;
 
 	public GigaSpaceStreetMap(String url) {
 		super();
 		space = new GigaSpaceConfigurer(new UrlSpaceConfigurer(url))
-		.gigaSpace();
+				.gigaSpace();
 	}
 
 	public void createSpaceMap() {
@@ -25,28 +28,76 @@ public class GigaSpaceStreetMap implements StreetMap {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Roxel[] fetchFullMap() {
 		Roxel[] map = space.readMultiple(new Roxel());
 		return map;
 	}
-	
-	
-	/*************HELPER***************************/
-	
+
+	public Roxel[] fetchCars() {
+		// @TODO: Wrong fetches only EmptyCars
+		Roxel r = new Roxel();
+		r.setOccupiedBy(EmptyCar.getInstance());
+		return space.readMultiple(r);
+	}
+
+	public Roxel takeByCoordinate(int x, int y, Car car) {
+		Roxel query = new Roxel();
+		query.setX(x);
+		query.setY(y);
+		query.setOccupiedBy(EmptyCar.getInstance());
+
+		Roxel next =  space.take(query, MAX_BLOCK);
+		next.setOccupiedBy(car);
+		space.write(next);
+		return next;
+	}
+
+	public Roxel takeNextRoxel(Roxel current, Direction direction) {
+		//in space auslagern oder über count methode;
+		int roxelMaxX = 7;
+		int roxelMaxY = 7;
+
+		Roxel query = new Roxel();
+		switch (direction) {
+		case EAST: 
+			query.setX((current.getX()+1)%roxelMaxX);
+			query.setY(current.getY());
+			query.setOccupiedBy(EmptyCar.getInstance());
+			break;
+		case SOUTH: 
+			query.setX(current.getX());
+			query.setY((current.getY()+1)%roxelMaxY);
+			query.setOccupiedBy(EmptyCar.getInstance());
+			break;
+		default:
+
+		}
+		Roxel next = space.take(query,MAX_BLOCK);
+
+		next.setOccupiedBy(current.getOccupiedBy());
+		space.write(next);
+		
+		System.out.println("Next R: " + next.getX() + ":" + next.getY());
+		current.setOccupiedBy(EmptyCar.getInstance());
+		space.write(current);
+		
+		return next;
+
+	}
+
+	/************* HELPER ***************************/
+
 	private void initStreetMap() throws Exception {
 		int maxX = 6;
 		int maxY = 6;
 
 		int length = 100;
 		for (int currentX = 0; currentX <= maxX; currentX++) {
-			// Roxel[] xRow = new Roxel[maxY+1];
-
 			for (int currentY = 0; currentY <= maxY; currentY++) {
 				boolean xEqual = currentX % 2 == 0;
 				boolean yEqual = currentY % 2 == 0;
 				Roxel r = null;
-				System.out.println("Init x: " + currentX + " y: " + currentY);
 				if (xEqual && yEqual) {
 					r = new Roxel(length, currentX, currentY, Direction.BLOCKED);
 				} else if (!xEqual && yEqual) {
@@ -59,17 +110,14 @@ public class GigaSpaceStreetMap implements StreetMap {
 				}
 				// xRow[currentY] = r;
 				if (space != null) {
+					r.setOccupiedBy(EmptyCar.getInstance());
 					space.write(r);
-				}else{
+				} else {
 					throw new Exception("Space not initialized");
 				}
-	
 			}
-			System.out.println("XCoord: " + currentX);
 			// space.writeMultiple(xRow);
 		}
 	}
-
-
 
 }
