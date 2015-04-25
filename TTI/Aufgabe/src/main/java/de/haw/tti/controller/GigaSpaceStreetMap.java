@@ -54,13 +54,13 @@ public class GigaSpaceStreetMap implements StreetMap {
 	}
 
 	public Roxel takeNextRoxel(Roxel current, Direction direction) {
-		//@TODO: über count methode;
 		Roxel query = new Roxel();
 		query.setX(0);
-		int roxelMaxX = (space.readMultiple(query)).length;
+		
+		int roxelMaxX = space.count(query);
 		query.setX(null);
 		query.setY(0);
-		int roxelMaxY = (space.readMultiple(query)).length;
+		int roxelMaxY = space.count(query);
 
 		switch (direction) {
 		case EAST: 
