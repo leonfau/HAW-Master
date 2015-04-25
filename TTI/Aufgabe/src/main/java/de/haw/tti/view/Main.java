@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -31,25 +32,32 @@ public class Main extends BasicGame {
 	public void init(GameContainer gc) throws SlickException {
 		map = spa.fetchFullMap();
 
-		Car car = new CarImpl(Direction.EAST, 0, 1);
+		Car car = new CarImpl(Direction.EAST, 0, 5, "black");
 		(new Thread((CarImpl) car)).start();
-		Car car2 = new CarImpl(Direction.EAST, 0, 3);
+		Car car2 = new CarImpl(Direction.EAST, 1, 5, "red");
 		(new Thread((CarImpl) car2)).start();
-		Car car5 = new CarImpl(Direction.EAST, 0, 5);
+		Car car5 = new CarImpl(Direction.EAST, 2, 5, "blue");
 		(new Thread((CarImpl) car5)).start();
 		
-		Car car3 = new CarImpl(Direction.SOUTH, 1, 0);
+		Car car10 = new CarImpl(Direction.EAST, 3, 5, "green");
+		(new Thread((CarImpl) car10)).start();
+		Car car11 = new CarImpl(Direction.EAST, 4, 5, "white");
+		(new Thread((CarImpl) car11)).start();
+		Car car12 = new CarImpl(Direction.EAST, 5, 5, "black");
+		(new Thread((CarImpl) car12)).start();
+		
+		Car car3 = new CarImpl(Direction.SOUTH, 1, 0, "red");
 		(new Thread((CarImpl) car3)).start();
-		Car car4 = new CarImpl(Direction.SOUTH, 3, 3);
+		Car car4 = new CarImpl(Direction.SOUTH, 3, 3, "blue");
 		(new Thread((CarImpl) car4)).start();
-		Car car6 = new CarImpl(Direction.SOUTH, 5, 0);
+		Car car6 = new CarImpl(Direction.SOUTH, 5, 0, "green");
 		(new Thread((CarImpl) car6)).start();
 		
-		Car car7 = new CarImpl(Direction.SOUTH, 1, 0);
+		Car car7 = new CarImpl(Direction.SOUTH, 1, 0, "white");
 		(new Thread((CarImpl) car7)).start();
-		Car car8 = new CarImpl(Direction.SOUTH, 3, 3);
+		Car car8 = new CarImpl(Direction.SOUTH, 3, 3, "black");
 		(new Thread((CarImpl) car8)).start();
-		Car car9 = new CarImpl(Direction.SOUTH, 5, 0);
+		Car car9 = new CarImpl(Direction.SOUTH, 5, 0, "red");
 		(new Thread((CarImpl) car9)).start();
 	}
 
@@ -66,7 +74,7 @@ public class Main extends BasicGame {
 			double yCoord = map[i].getY() * size;
 			Image img = null;
 			if (!map[i].getOccupiedBy().isEmpty()) {
-				img = new Image("assets/car.png");
+				img = new Image("assets/car-"+ ((CarImpl)map[i].getOccupiedBy()).getColor() +".png");
 				
 				switch (((CarImpl) map[i].getOccupiedBy()).getDirection()) {
 

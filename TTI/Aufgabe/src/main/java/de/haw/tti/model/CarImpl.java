@@ -13,13 +13,15 @@ public class CarImpl implements Car, Runnable {
 	StreetMap spa;
 	int initX;
 	int initY;
+	String color = "";
 
 	// default constructor, required
-	public CarImpl(Direction dir, int initX, int initY) {
+	public CarImpl(Direction dir, int initX, int initY, String color) {
 		this.direction = dir;
 		spa = new GigaSpaceStreetMap("/./streetMap");
 		this.initX = initX;
 		this.initY = initY;
+		this.color = color;
 	}
 	@SpaceProperty
 	public Direction getDirection(){
@@ -38,6 +40,10 @@ public class CarImpl implements Car, Runnable {
 	@SpaceProperty
 	public boolean isEmpty() {
 		return false;
+	}
+	
+	public String getColor(){
+		return color;
 	}
 
 	private Roxel enterInitialRoxel(int x, int y) {

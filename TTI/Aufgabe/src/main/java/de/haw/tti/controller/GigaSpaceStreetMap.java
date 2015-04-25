@@ -54,11 +54,14 @@ public class GigaSpaceStreetMap implements StreetMap {
 	}
 
 	public Roxel takeNextRoxel(Roxel current, Direction direction) {
-		//in space auslagern oder über count methode;
-		int roxelMaxX = 7;
-		int roxelMaxY = 7;
-
+		//@TODO: über count methode;
 		Roxel query = new Roxel();
+		query.setX(0);
+		int roxelMaxX = (space.readMultiple(query)).length;
+		query.setX(null);
+		query.setY(0);
+		int roxelMaxY = (space.readMultiple(query)).length;
+
 		switch (direction) {
 		case EAST: 
 			query.setX((current.getX()+1)%roxelMaxX);
@@ -78,7 +81,6 @@ public class GigaSpaceStreetMap implements StreetMap {
 		next.setOccupiedBy(current.getOccupiedBy());
 		space.write(next);
 		
-		System.out.println("Next R: " + next.getX() + ":" + next.getY());
 		current.setOccupiedBy(EmptyCar.getInstance());
 		space.write(current);
 		
