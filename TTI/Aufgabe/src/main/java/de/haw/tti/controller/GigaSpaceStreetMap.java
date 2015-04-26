@@ -79,10 +79,10 @@ public class GigaSpaceStreetMap implements StreetMap {
 		Roxel query = new Roxel();
 		query.setX(0);
 
-		int roxelMaxX = space.count(query);
+		int roxelMaxX = 7;//space.count(query);
 		query.setX(null);
 		query.setY(0);
-		int roxelMaxY = space.count(query);
+		int roxelMaxY = 7;//space.count(query);
 
 		switch (direction) {
 		case EAST:
