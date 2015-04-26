@@ -1,6 +1,7 @@
 package de.haw.tti.model;
 
-public interface Car {
+import java.io.Serializable;
 
-	public boolean isEmpty();
+public interface Car extends Serializable{
+
 }

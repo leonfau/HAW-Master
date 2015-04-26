@@ -1,7 +1,10 @@
 package de.haw.tti.controller;
 
+import net.jini.core.lease.Lease;
+
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
+
 import org.openspaces.core.space.UrlSpaceConfigurer;
 
 import de.haw.tti.model.Car;
@@ -12,17 +15,22 @@ import de.haw.tti.model.Roxel;
 public class GigaSpaceStreetMap implements StreetMap {
 
 	private GigaSpace space;
-	private final int MAX_BLOCK = 5000;
+	private final int MAX_BLOCK = 500000;
+	private EmptyCar emptyCar;
 
 	public GigaSpaceStreetMap(String url) {
 		super();
 		space = new GigaSpaceConfigurer(new UrlSpaceConfigurer(url))
 				.gigaSpace();
+
+		emptyCar = space.read(new EmptyCar());
+
 	}
 
 	public void createSpaceMap() {
 		try {
-			this.initStreetMap();
+			this.emptyCar = this.initEmptyCar();
+			this.initStreetMap(emptyCar);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -30,71 +38,93 @@ public class GigaSpaceStreetMap implements StreetMap {
 	}
 
 	public Roxel[] fetchFullMap() {
-		Roxel[] map = space.readMultiple(new Roxel());
-		return map;
+		Roxel q = new Roxel();
+		q.setIsOccupied(true);
+		Roxel[] occ = space.readMultiple(q);
+		q.setIsOccupied(false);
+		Roxel[] map = space.readMultiple(q);
+
+		Roxel[] result = new Roxel[occ.length + map.length];
+		System.arraycopy(occ, 0, result, 0, occ.length);
+		System.arraycopy(map, 0, result, occ.length, map.length);
+		return result;
 	}
 
 	public Roxel[] fetchCars() {
 		// @TODO: Wrong fetches only EmptyCars
 		Roxel r = new Roxel();
-		r.setOccupiedBy(EmptyCar.getInstance());
+		r.setOccupiedBy(new EmptyCar());
 		return space.readMultiple(r);
 	}
 
-	public Roxel takeByCoordinate(int x, int y, Car car) {
+	public Roxel takeByCoordinate(int x, int y, Car car) throws Exception {
 		Roxel query = new Roxel();
 		query.setX(x);
 		query.setY(y);
-		query.setOccupiedBy(EmptyCar.getInstance());
+		// query.setOccupiedBy(emptyCar);
+		query.setIsOccupied(false);
 
-		Roxel next =  space.take(query, MAX_BLOCK);
+		System.out.println("Find for: " + x + ":" + y);
+		Roxel next = space.take(query, MAX_BLOCK);
+		if (next == null) {
+			throw new Exception("roxel not found");
+		}
 		next.setOccupiedBy(car);
 		space.write(next);
 		return next;
 	}
 
-	public Roxel takeNextRoxel(Roxel current, Direction direction) {
+	public Roxel takeNextRoxel(Roxel current, Direction direction)
+			throws Exception {
 		Roxel query = new Roxel();
 		query.setX(0);
-		
+
 		int roxelMaxX = space.count(query);
 		query.setX(null);
 		query.setY(0);
 		int roxelMaxY = space.count(query);
 
 		switch (direction) {
-		case EAST: 
-			query.setX((current.getX()+1)%roxelMaxX);
+		case EAST:
+			query.setX((current.getX() + 1) % roxelMaxX);
 			query.setY(current.getY());
-			query.setOccupiedBy(EmptyCar.getInstance());
 			break;
-		case SOUTH: 
+		case SOUTH:
 			query.setX(current.getX());
-			query.setY((current.getY()+1)%roxelMaxY);
-			query.setOccupiedBy(EmptyCar.getInstance());
+			query.setY((current.getY() + 1) % roxelMaxY);
 			break;
 		default:
 
 		}
-		Roxel next = space.take(query,MAX_BLOCK);
+		query.setIsOccupied(false);
 
-		next.setOccupiedBy(current.getOccupiedBy());
+		Roxel next = space.take(query, MAX_BLOCK);
+
+		if (next == null) {
+			throw new Exception("roxel not found");
+
+		}
+		Car c = current.getOccupiedBy();
+		next.setOccupiedBy(c);
 		space.write(next);
-		
-		current.setOccupiedBy(EmptyCar.getInstance());
+
+		current.setOccupiedBy(emptyCar);
 		space.write(current);
-		
+
 		return next;
 
 	}
 
 	/************* HELPER ***************************/
 
-	private void initStreetMap() throws Exception {
+	private void initStreetMap(EmptyCar empty) throws Exception {
 		int maxX = 6;
 		int maxY = 6;
 
 		int length = 100;
+		int roxelCount = (maxX + 1) * (maxY + 1);
+		Roxel map[] = new Roxel[roxelCount];
+		int i = 0;
 		for (int currentX = 0; currentX <= maxX; currentX++) {
 			for (int currentY = 0; currentY <= maxY; currentY++) {
 				boolean xEqual = currentX % 2 == 0;
@@ -112,14 +142,21 @@ public class GigaSpaceStreetMap implements StreetMap {
 				}
 				// xRow[currentY] = r;
 				if (space != null) {
-					r.setOccupiedBy(EmptyCar.getInstance());
-					space.write(r);
+					r.setOccupiedBy(empty);
+					map[i++] = r;
 				} else {
 					throw new Exception("Space not initialized");
 				}
 			}
 			// space.writeMultiple(xRow);
 		}
+		space.writeMultiple(map);
+	}
+
+	private EmptyCar initEmptyCar() {
+		EmptyCar empty = new EmptyCar();
+		space.write(empty, Lease.FOREVER);
+		return empty;
 	}
 
 }

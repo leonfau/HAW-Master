@@ -11,9 +11,9 @@ public interface StreetMap {
 
 	public Roxel[] fetchCars();
 	
-	public Roxel takeByCoordinate(int x, int y, Car car);
+	public Roxel takeByCoordinate(int x, int y, Car car) throws Exception;
 	
-	public Roxel takeNextRoxel(Roxel current, Direction direction);
+	public Roxel takeNextRoxel(Roxel current, Direction direction) throws Exception;
 
 
 

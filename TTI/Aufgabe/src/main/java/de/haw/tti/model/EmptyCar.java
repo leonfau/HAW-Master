@@ -1,23 +1,28 @@
 package de.haw.tti.model;
 
 import com.gigaspaces.annotation.pojo.SpaceClass;
+import com.gigaspaces.annotation.pojo.SpaceId;
 
 @SpaceClass
 public class EmptyCar implements Car {
-	private static Car empty = null;
-
+	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7720110171982923436L;
+	private String id;
 	// default constructor, required
-	private EmptyCar() {
+	public EmptyCar() {
+	}
+	
+	@SpaceId(autoGenerate = true)
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public static Car getInstance(){
-		if (empty== null){
-			empty = new EmptyCar();
-		}
-		return empty;
-	}
-
-	public boolean isEmpty() {
-		return true;
-	}
 }

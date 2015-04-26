@@ -13,6 +13,7 @@ public class Roxel {
 	private Car occupiedBy;
 	private Direction direction;
 	private String id;
+	private boolean isOccupied;
 
 	// default constructor, required
 	public Roxel() {
@@ -24,7 +25,8 @@ public class Roxel {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
-		this.occupiedBy =  EmptyCar.getInstance();
+		this.occupiedBy = new EmptyCar();
+		//this.isOccupied = false;
 	}
 
 	// @SpaceId
@@ -58,7 +60,7 @@ public class Roxel {
 	public void setX(Integer x) {
 		this.x = x;
 	}
-	
+
 	@SpaceProperty
 	public Integer getY() {
 		return y;
@@ -75,6 +77,20 @@ public class Roxel {
 
 	public void setOccupiedBy(Car occupiedBy) {
 		this.occupiedBy = occupiedBy;
+		if (occupiedBy instanceof EmptyCar) {
+			this.isOccupied = false;
+		} else {
+			this.isOccupied = true;
+		}
+	}
+
+	@SpaceProperty
+	public boolean getIsOccupied() {
+		return isOccupied;
+	}
+
+	public void setIsOccupied(boolean occupied) {
+		this.isOccupied = occupied;
 	}
 
 	@SpaceProperty

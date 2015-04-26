@@ -9,16 +9,21 @@ import de.haw.tti.controller.StreetMap;
 @SpaceClass
 public class CarImpl implements Car, Runnable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6856578963919981143L;
+	
 	private Direction direction;
-	StreetMap spa;
-	int initX;
-	int initY;
-	String color = "";
+	private int initX;
+	private int initY;
+	private String color = "";
 
 	// default constructor, required
+	public CarImpl(){}
+	
 	public CarImpl(Direction dir, int initX, int initY, String color) {
 		this.direction = dir;
-		spa = new GigaSpaceStreetMap("/./streetMap");
 		this.initX = initX;
 		this.initY = initY;
 		this.color = color;
@@ -37,17 +42,21 @@ public class CarImpl implements Car, Runnable {
 			currentRoxel = moveToNextRoxel(currentRoxel);
 		}
 	}
-	@SpaceProperty
-	public boolean isEmpty() {
-		return false;
-	}
 	
+	@SpaceProperty
 	public String getColor(){
 		return color;
 	}
 
 	private Roxel enterInitialRoxel(int x, int y) {
-		Roxel r = spa.takeByCoordinate(x, y, this);
+		Roxel r = null;
+		try {
+			StreetMap spa = new GigaSpaceStreetMap("jini://*/*/streetMap");
+			r = spa.takeByCoordinate(x, y, this);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return r;
 	}
 
@@ -64,7 +73,14 @@ public class CarImpl implements Car, Runnable {
 	}
 
 	private Roxel moveToNextRoxel(Roxel current) {
-		return spa.takeNextRoxel(current, direction);
+		StreetMap spa = new GigaSpaceStreetMap("jini://*/*/streetMap");
+		try {
+			return spa.takeNextRoxel(current, direction);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
