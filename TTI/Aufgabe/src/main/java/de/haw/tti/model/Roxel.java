@@ -4,6 +4,9 @@ import com.gigaspaces.annotation.pojo.SpaceClass;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceProperty;
 
+import de.haw.tti.car.Car;
+import de.haw.tti.car.EmptyCar;
+
 @SpaceClass
 public class Roxel {
 

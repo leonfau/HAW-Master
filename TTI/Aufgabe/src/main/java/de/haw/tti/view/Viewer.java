@@ -10,9 +10,9 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import de.haw.tti.car.CarImpl;
 import de.haw.tti.controller.GigaSpaceStreetMap;
 import de.haw.tti.controller.StreetMap;
-import de.haw.tti.model.CarImpl;
 import de.haw.tti.model.Roxel;
 
 public class Viewer extends BasicGame {
@@ -42,15 +42,8 @@ public class Viewer extends BasicGame {
 			double xCoord = map[i].getX() * size;
 			double yCoord = map[i].getY() * size;
 			Image img = null;
-			
-			if (map[i].getIsOccupied()) {
-				System.out.println("Occupied: " + xCoord + ":" + yCoord);
 
-				System.out.println("Hallo" + map[i].getIsOccupied());
-				System.out.println(i);
-				System.out.println("assets/car-"
-						+ ((CarImpl) map[i].getOccupiedBy()).getColor()
-						+ ".png");
+			if (map[i].getIsOccupied()) {
 				img = new Image("assets/car-"
 						+ ((CarImpl) map[i].getOccupiedBy()).getColor()
 						+ ".png");
@@ -84,7 +77,7 @@ public class Viewer extends BasicGame {
 			}
 			if (img != null) {
 				img.draw(new Float(xCoord), new Float(yCoord));
-			}else{
+			} else {
 				System.out.println("img null");
 			}
 		}
@@ -92,24 +85,10 @@ public class Viewer extends BasicGame {
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		// @TODO: nur noch in init, nur noch autos abfragen
-		 map = spa.fetchFullMap();
-		
+		map = spa.fetchFullMap();
+
 		// Roxel[] cars = spa.fetchCars();
-		
+
 		this.drawMap();
-
 	}
-
-	public static void main(String[] args) {
-		try {
-			AppGameContainer appgc;
-			appgc = new AppGameContainer(new Viewer("TTI Praktikum"));
-			appgc.setDisplayMode(700, 700, false);
-			appgc.setShowFPS(false);
-			appgc.start();
-		} catch (SlickException ex) {
-			Logger.getLogger(Viewer.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-
 }

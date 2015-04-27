@@ -4,12 +4,13 @@ import net.jini.core.lease.Lease;
 
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
-
 import org.openspaces.core.space.UrlSpaceConfigurer;
 
-import de.haw.tti.model.Car;
+import de.haw.tti.car.Car;
+import de.haw.tti.car.EmptyCar;
+import de.haw.tti.exception.RoxelNotFoundException;
+import de.haw.tti.exception.SpaceNotInitializedException;
 import de.haw.tti.model.Direction;
-import de.haw.tti.model.EmptyCar;
 import de.haw.tti.model.Roxel;
 
 public class GigaSpaceStreetMap implements StreetMap {
@@ -27,14 +28,10 @@ public class GigaSpaceStreetMap implements StreetMap {
 
 	}
 
-	public void createSpaceMap() {
-		try {
-			this.emptyCar = this.initEmptyCar();
-			this.initStreetMap(emptyCar);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void createSpaceMap() throws SpaceNotInitializedException {
+
+		this.initEmptyCar();
+		this.initStreetMap(emptyCar);
 	}
 
 	public Roxel[] fetchFullMap() {
@@ -57,17 +54,17 @@ public class GigaSpaceStreetMap implements StreetMap {
 		return space.readMultiple(r);
 	}
 
-	public Roxel takeByCoordinate(int x, int y, Car car) throws Exception {
+	public Roxel takeByCoordinate(int x, int y, Car car)
+			throws RoxelNotFoundException {
 		Roxel query = new Roxel();
 		query.setX(x);
 		query.setY(y);
 		// query.setOccupiedBy(emptyCar);
 		query.setIsOccupied(false);
 
-		System.out.println("Find for: " + x + ":" + y);
 		Roxel next = space.take(query, MAX_BLOCK);
 		if (next == null) {
-			throw new Exception("roxel not found");
+			throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " +  query.getY());
 		}
 		next.setOccupiedBy(car);
 		space.write(next);
@@ -75,14 +72,14 @@ public class GigaSpaceStreetMap implements StreetMap {
 	}
 
 	public Roxel takeNextRoxel(Roxel current, Direction direction)
-			throws Exception {
+			throws RoxelNotFoundException {
 		Roxel query = new Roxel();
 		query.setX(0);
 
-		int roxelMaxX = 7;//space.count(query);
+		int roxelMaxX = 7;// space.count(query);
 		query.setX(null);
 		query.setY(0);
-		int roxelMaxY = 7;//space.count(query);
+		int roxelMaxY = 7;// space.count(query);
 
 		switch (direction) {
 		case EAST:
@@ -101,7 +98,7 @@ public class GigaSpaceStreetMap implements StreetMap {
 		Roxel next = space.take(query, MAX_BLOCK);
 
 		if (next == null) {
-			throw new Exception("roxel not found");
+			throw new RoxelNotFoundException("roxel not found");
 
 		}
 		Car c = current.getOccupiedBy();
@@ -117,7 +114,8 @@ public class GigaSpaceStreetMap implements StreetMap {
 
 	/************* HELPER ***************************/
 
-	private void initStreetMap(EmptyCar empty) throws Exception {
+	private void initStreetMap(EmptyCar empty)
+			throws SpaceNotInitializedException {
 		int maxX = 6;
 		int maxY = 6;
 
@@ -140,23 +138,23 @@ public class GigaSpaceStreetMap implements StreetMap {
 					r = new Roxel(length, currentX, currentY,
 							Direction.TODECIDE);
 				}
-				// xRow[currentY] = r;
-				if (space != null) {
-					r.setOccupiedBy(empty);
-					map[i++] = r;
-				} else {
-					throw new Exception("Space not initialized");
-				}
+				r.setOccupiedBy(empty);
+				map[i++] = r;
 			}
-			// space.writeMultiple(xRow);
+		}
+		if (space == null) {
+			throw new SpaceNotInitializedException("space is null");
 		}
 		space.writeMultiple(map);
 	}
 
-	private EmptyCar initEmptyCar() {
+	private void initEmptyCar() throws SpaceNotInitializedException {
+		if (space == null) {
+			throw new SpaceNotInitializedException("space is null");
+		}
 		EmptyCar empty = new EmptyCar();
 		space.write(empty, Lease.FOREVER);
-		return empty;
+		this.emptyCar =  empty;
 	}
 
 }

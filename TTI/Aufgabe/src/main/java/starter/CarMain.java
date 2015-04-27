@@ -1,7 +1,7 @@
-package de.haw.tti.view;
+package starter;
 
-import de.haw.tti.model.Car;
-import de.haw.tti.model.CarImpl;
+import de.haw.tti.car.Car;
+import de.haw.tti.car.CarImpl;
 import de.haw.tti.model.Direction;
 
 public class CarMain {

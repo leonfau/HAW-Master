@@ -1,4 +1,4 @@
-package de.haw.tti.model;
+package de.haw.tti.car;
 
 import com.gigaspaces.annotation.pojo.SpaceClass;
 import com.gigaspaces.annotation.pojo.SpaceId;
