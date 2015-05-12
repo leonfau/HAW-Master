@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jboss.ws:jbossws-api:1.0.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/ws/jbossws-api/1.0.0-SNAPSHOT/jbossws-api-1.0.0-20111220.082041-24.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/ws/jbossws-api/1.0.0-SNAPSHOT/jbossws-api-1.0.0-20111220.082041-24-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/ws/jbossws-api/1.0.0-SNAPSHOT/jbossws-api-1.0.0-20111220.082041-24-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
