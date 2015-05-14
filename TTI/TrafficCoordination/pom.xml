@@ -23,10 +23,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
-		<module>common</module>
-		<module>processor</module>
-		<module>feeder</module>
-		<module>visualization</module>
+		<module>Common</module>
+		<module>Processor</module>
+		<module>Feeder</module>
+		<module>Visualization</module>
 
 	</modules>
 	<dependencies>
