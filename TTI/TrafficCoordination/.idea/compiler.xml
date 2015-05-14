@@ -38,12 +38,20 @@
         <processorPath useClasspath="true" />
         <module name="processor" />
       </profile>
+      <profile default="false" name="Annotation profile for visualization" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="visualization" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common" target="1.6" />
       <module name="feeder" target="1.6" />
       <module name="processor" target="1.6" />
       <module name="TrafficCoordination" target="1.6" />
+      <module name="visualization" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>

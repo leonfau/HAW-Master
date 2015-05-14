@@ -2,6 +2,9 @@ package de.haw.trafficcoordination.feeder;
 
 import de.haw.trafficcoordination.common.Data;
 
+import de.haw.trafficcoordination.common.Entities.Direction;
+import de.haw.trafficcoordination.common.Entities.EmptyCar;
+import de.haw.trafficcoordination.common.Entities.Roxel;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.SpaceInterruptedException;
 import org.openspaces.core.context.GigaSpaceContext;
@@ -18,10 +21,10 @@ import java.util.logging.Logger;
 /**
  * A feeder bean starts a scheduled task that writes a new Data objects to the space
  * (in an unprocessed state).
- *
+ * <p>
  * <p>The space is injected into this bean using OpenSpaces support for @GigaSpaceContext
  * annotation.
- *
+ * <p>
  * <p>The scheduling uses the java.util.concurrent Scheduled Executor Service. It
  * is started and stopped based on Spring life cycle events.
  *
@@ -29,75 +32,61 @@ import java.util.logging.Logger;
  */
 public class Feeder implements InitializingBean, DisposableBean {
 
-    Logger log= Logger.getLogger(this.getClass().getName());
-    
-    private ScheduledExecutorService executorService;
+    Logger log = Logger.getLogger(this.getClass().getName());
+
 
     private ScheduledFuture<?> sf;
+    private ScheduledExecutorService executorService;
 
-    private long numberOfTypes = 10;
 
-    private long defaultDelay = 1000;
-
-    private FeederTask feederTask;
 
     @GigaSpaceContext
     private GigaSpace gigaSpace;
 
-    /**
-     * Sets the number of types that will be used to set {@link org.openspaces.example.data.common.Data#setType(Long)}.
-     *
-     * <p>The type is used as the routing index for partitioned space. This will affect the distribution of Data
-     * objects over a partitioned space.
-     */
-    public void setNumberOfTypes(long numberOfTypes) {
-        this.numberOfTypes = numberOfTypes;
-    }
-
-    public void setDefaultDelay(long defaultDelay) {
-        this.defaultDelay = defaultDelay;
-    }
 
     public void afterPropertiesSet() throws Exception {
-        log.info("--- STARTING FEEDER WITH CYCLE [" + defaultDelay + "]");
-        executorService = Executors.newScheduledThreadPool(1);
-        feederTask = new FeederTask();
-        sf = executorService.scheduleAtFixedRate(feederTask, defaultDelay, defaultDelay,
-                TimeUnit.MILLISECONDS);
+        log.info("--- Create World Map");
+//        executorService = Executors.newScheduledThreadPool(1);
+        Roxel[] map = this.createMap();
+        log.info("---" + map.length + " Roxel");
+        gigaSpace.writeMultiple(map);
+        log.info(gigaSpace.readMultiple(new Roxel()).length + " found");
     }
 
     public void destroy() throws Exception {
         sf.cancel(false);
         sf = null;
-        executorService.shutdown();
-    }
-    
-    public long getFeedCount() {
-        return feederTask.getCounter();
+        this.executorService.shutdown();
     }
 
-    
-    public class FeederTask implements Runnable {
 
-        private long counter = 1;
+    private Roxel[] createMap() {
+        int maxX = 6;
+        int maxY = 6;
 
-        public void run() {
-            try {
-                long time = System.currentTimeMillis();
-                Data data = new Data((counter++ % numberOfTypes), "FEEDER " + Long.toString(time));
-                gigaSpace.write(data);
-                log.info("--- FEEDER WROTE " + data);
-            } catch (SpaceInterruptedException e) {
-                // ignore, we are being shutdown
-            } catch (Exception e) {
-                e.printStackTrace();
+        int length = 100;
+        int roxelCount = (maxX + 1) * (maxY + 1);
+        Roxel map[] = new Roxel[roxelCount];
+        int i = 0;
+        for (int currentX = 0; currentX <= maxX; currentX++) {
+            for (int currentY = 0; currentY <= maxY; currentY++) {
+                boolean xEqual = currentX % 2 == 0;
+                boolean yEqual = currentY % 2 == 0;
+                Roxel r = null;
+                if (xEqual && yEqual) {
+                    r = new Roxel(length, currentX, currentY, Direction.BLOCKED);
+                } else if (!xEqual && yEqual) {
+                    r = new Roxel(length, currentX, currentY, Direction.SOUTH);
+                } else if (xEqual && !yEqual) {
+                    r = new Roxel(length, currentX, currentY, Direction.EAST);
+                } else if (!xEqual && !yEqual) {
+                    r = new Roxel(length, currentX, currentY,
+                            Direction.TODECIDE);
+                }
+                r.setOccupiedBy(new EmptyCar());
+                map[i++] = r;
             }
         }
-
-        public long getCounter() {
-            return counter;
-        }
+        return map;
     }
-
-    
 }

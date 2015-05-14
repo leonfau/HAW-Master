@@ -48,17 +48,17 @@
         Once a match is found, the data processor bean event listener is triggered using the
         annotation adapter.
     -->
-    <os-events:polling-container id="dataProcessorPollingEventContainer" giga-space="gigaSpace">
-        <os-events:tx-support tx-manager="transactionManager"/>
-        <os-core:template>
-            <bean class="de.haw.trafficcoordination.common.Data">
-                <property name="processed" value="false"/>
-            </bean>
-        </os-core:template>
-        <os-events:listener>
-            <os-events:annotation-adapter>
-                <os-events:delegate ref="dataProcessor"/>
-            </os-events:annotation-adapter>
-        </os-events:listener>
-    </os-events:polling-container>
+    <!--<os-events:polling-container id="dataProcessorPollingEventContainer" giga-space="gigaSpace">-->
+        <!--<os-events:tx-support tx-manager="transactionManager"/>-->
+        <!--<os-core:template>-->
+            <!--&lt;!&ndash;<bean class="de.haw.trafficcoordination.common.Data">&ndash;&gt;-->
+                <!--&lt;!&ndash;<property name="processed" value="false"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;</bean>&ndash;&gt;-->
+        <!--</os-core:template>-->
+        <!--<os-events:listener>-->
+            <!--<os-events:annotation-adapter>-->
+                <!--<os-events:delegate ref="dataProcessor"/>-->
+            <!--</os-events:annotation-adapter>-->
+        <!--</os-events:listener>-->
+    <!--</os-events:polling-container>-->
 </beans>

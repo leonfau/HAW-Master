@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <id>assemble-pu</id>
+    <formats>
+        <format>jar</format>
+        <format>zip</format>
+        <format>dir</format>
+    </formats>
+
+    <files>
+        <file>
+            <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
+    <fileSets>
+        <fileSet>
+            <directory>target/classes</directory>
+            <lineEnding>keep</lineEnding>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>target/natives</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*.dll</include>
+                <include>*.so</include>
+                <include>*.jnilib</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main/scripts</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>*.sh</include>
+                <include>*.bat</include>
+            </includes>
+            <filtered>true</filtered>
+            <fileMode>0755</fileMode>
+        </fileSet>
+    </fileSets>
+
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <scope>runtime</scope>
+            <excludes>
+                <exclude>*:natives-*</exclude>
+            </excludes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <outputDirectory>lib</outputDirectory>
+            <excludes>
+                <exclude>TrafficCoordination:Common</exclude>
+            </excludes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>TrafficCoordination:Common</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+</assembly>

@@ -6,6 +6,9 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/ant/ant/1.6.3/ant-1.6.3-javadoc.jar!/" />
     </JAVADOC>
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/../Aufgabe/lib/Linux" />
+    </NATIVE>
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/ant/ant/1.6.3/ant-1.6.3-sources.jar!/" />
     </SOURCES>

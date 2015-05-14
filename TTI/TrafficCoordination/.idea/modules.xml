@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/feeder/feeder.iml" filepath="$PROJECT_DIR$/feeder/feeder.iml" />
       <module fileurl="file://$PROJECT_DIR$/processor/processor.iml" filepath="$PROJECT_DIR$/processor/processor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/visualization/visualization.iml" filepath="$PROJECT_DIR$/visualization/visualization.iml" />
     </modules>
   </component>
 </project>
