@@ -2,9 +2,7 @@ package de.haw.trafficcoordination.feeder;
 
 import de.haw.trafficcoordination.common.Data;
 
-import de.haw.trafficcoordination.common.Entities.Direction;
-import de.haw.trafficcoordination.common.Entities.EmptyCar;
-import de.haw.trafficcoordination.common.Entities.Roxel;
+import de.haw.trafficcoordination.common.Entities.*;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.SpaceInterruptedException;
 import org.openspaces.core.context.GigaSpaceContext;
@@ -51,6 +49,9 @@ public class Feeder implements InitializingBean, DisposableBean {
         log.info("---" + map.length + " Roxel");
         gigaSpace.writeMultiple(map);
         log.info(gigaSpace.readMultiple(new Roxel()).length + " found");
+        /***Test***/
+        Car car = new CarImpl(Direction.EAST, 0, 1, "black");
+        new Thread((new CarThread((CarImpl) car))).start();
     }
 
     public void destroy() throws Exception {

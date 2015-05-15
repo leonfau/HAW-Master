@@ -72,7 +72,7 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
             double xCoord = cars[i].getX() * size;
             double yCoord = cars[i].getY() * size;
             Image img = null;
-            img = new Image("assets/car-"
+            img = new Image("images/car-"
                     + ((CarImpl) cars[i].getOccupiedBy()).getColor() + ".png");
             switch (((CarImpl)cars[i].getOccupiedBy()).getDirection()) {
                 case SOUTH:
