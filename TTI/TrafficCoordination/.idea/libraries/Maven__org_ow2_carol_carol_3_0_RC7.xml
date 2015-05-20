@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.ow2.carol:carol:3.0-RC7">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ow2/carol/carol/3.0-RC7/carol-3.0-RC7.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ow2/carol/carol/3.0-RC7/carol-3.0-RC7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ow2/carol/carol/3.0-RC7/carol-3.0-RC7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
