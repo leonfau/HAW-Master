@@ -62,10 +62,10 @@ public class Feeder implements InitializingBean, DisposableBean {
 
 
     private Roxel[] createMap() {
-        int maxX = 6;
-        int maxY = 6;
+        int maxX = 20;
+        int maxY = 20;
 
-        int length = 100;
+        int length = 50;
         int roxelCount = (maxX + 1) * (maxY + 1);
         Roxel map[] = new Roxel[roxelCount];
         int i = 0;
