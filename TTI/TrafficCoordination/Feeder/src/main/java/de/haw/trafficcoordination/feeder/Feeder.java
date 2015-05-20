@@ -37,6 +37,8 @@ public class Feeder implements InitializingBean, DisposableBean {
     private ScheduledExecutorService executorService;
     private static final int X_SIZE = 20;
     private static final int Y_SIZE = 20;
+    private static final int ROXEL_SIZE = 50;
+    private static final int CAR_AMOUNT = 50;
 
 
     @GigaSpaceContext
@@ -51,7 +53,7 @@ public class Feeder implements InitializingBean, DisposableBean {
         gigaSpace.writeMultiple(map);
         log.info(gigaSpace.readMultiple(new Roxel()).length + " found");
 
-        this.createRandomCars(12);
+        this.createRandomCars(CAR_AMOUNT);
     }
 
     public void destroy() throws Exception {
@@ -62,7 +64,6 @@ public class Feeder implements InitializingBean, DisposableBean {
 
 
     private Roxel[] createMap() {
-        int length = 50;
         int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
         Roxel map[] = new Roxel[roxelCount];
         int i = 0;
@@ -72,13 +73,13 @@ public class Feeder implements InitializingBean, DisposableBean {
                 boolean yEqual = currentY % 2 == 0;
                 Roxel r = null;
                 if (xEqual && yEqual) {
-                    r = new Roxel(length, currentX, currentY, Direction.BLOCKED);
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED);
                 } else if (!xEqual && yEqual) {
-                    r = new Roxel(length, currentX, currentY, Direction.SOUTH);
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH);
                 } else if (xEqual && !yEqual) {
-                    r = new Roxel(length, currentX, currentY, Direction.EAST);
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST);
                 } else if (!xEqual && !yEqual) {
-                    r = new Roxel(length, currentX, currentY,
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY,
                             Direction.TODECIDE);
                 }
                 r.setOccupiedBy(new EmptyCar());
@@ -96,23 +97,24 @@ public class Feeder implements InitializingBean, DisposableBean {
         for (; amount > 0; amount--) {
             int x = random.nextInt(X_SIZE);
             int y = random.nextInt(Y_SIZE);
-            Direction dir = Direction.EAST;
+            Direction dir = null;
 
-            if (x % 2 == 0 && y % 2 == 0)
+            while (x % 2 == 0 && y % 2 == 0)
             {
                 if(random.nextBoolean()){
                     x = ((x+1)% X_SIZE);
-                    dir = Direction.EAST;
                 }else{
                     y = ((y+1)% X_SIZE);
-                    dir = Direction.SOUTH;
                 }
-            }else if(x%2 != 0) {
+            }
+
+            if(x%2 != 0) {
                 dir = Direction.SOUTH;
             }else{
                 dir = Direction.EAST;
 
             }
+
             Car car = new CarImpl(dir, x, y, colors.get(random.nextInt(colors.size() - 1)));
             new Thread((new CarThread((CarImpl) car))).start();
         }
