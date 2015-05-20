@@ -105,10 +105,10 @@ public class CarThread implements Runnable {
         Roxel query = new Roxel();
         query.setX(0);
 
-        int roxelMaxX = 7;// space.count(query);
+        int roxelMaxX = spa.count(query);
         query.setX(null);
         query.setY(0);
-        int roxelMaxY = 7;// space.count(query);
+        int roxelMaxY = spa.count(query);
 
         switch (direction) {
             case EAST:

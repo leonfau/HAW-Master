@@ -129,11 +129,11 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
 
     private static void start() throws SlickException {
         AppGameContainer app = new AppGameContainer(new Visualization());
-        app.setDisplayMode(700, 700, false);
+        app.setDisplayMode(1000, 1000, false);
       //  app.setTargetFrameRate(FRAMERATE);
       //  app.setMaximumLogicUpdateInterval(FRAMERATE);
       //  app.setForceExit(false);
-      //  app.setVSync(true);
+       // app.setVSync(true);
         app.start();
     }
 
