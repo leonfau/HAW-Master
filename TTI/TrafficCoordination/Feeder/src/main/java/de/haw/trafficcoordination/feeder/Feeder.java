@@ -1,19 +1,19 @@
 package de.haw.trafficcoordination.feeder;
 
-import de.haw.trafficcoordination.common.Data;
 
 import de.haw.trafficcoordination.common.Entities.*;
 import org.openspaces.core.GigaSpace;
-import org.openspaces.core.SpaceInterruptedException;
 import org.openspaces.core.context.GigaSpaceContext;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -35,7 +35,8 @@ public class Feeder implements InitializingBean, DisposableBean {
 
     private ScheduledFuture<?> sf;
     private ScheduledExecutorService executorService;
-
+    private static final int X_SIZE = 20;
+    private static final int Y_SIZE = 20;
 
 
     @GigaSpaceContext
@@ -49,9 +50,8 @@ public class Feeder implements InitializingBean, DisposableBean {
         log.info("---" + map.length + " Roxel");
         gigaSpace.writeMultiple(map);
         log.info(gigaSpace.readMultiple(new Roxel()).length + " found");
-        /***Test***/
-        Car car = new CarImpl(Direction.EAST, 0, 1, "black");
-        new Thread((new CarThread((CarImpl) car))).start();
+
+        this.createRandomCars(12);
     }
 
     public void destroy() throws Exception {
@@ -62,15 +62,12 @@ public class Feeder implements InitializingBean, DisposableBean {
 
 
     private Roxel[] createMap() {
-        int maxX = 20;
-        int maxY = 20;
-
         int length = 50;
-        int roxelCount = (maxX + 1) * (maxY + 1);
+        int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
         Roxel map[] = new Roxel[roxelCount];
         int i = 0;
-        for (int currentX = 0; currentX <= maxX; currentX++) {
-            for (int currentY = 0; currentY <= maxY; currentY++) {
+        for (int currentX = 0; currentX <= X_SIZE; currentX++) {
+            for (int currentY = 0; currentY <= Y_SIZE; currentY++) {
                 boolean xEqual = currentX % 2 == 0;
                 boolean yEqual = currentY % 2 == 0;
                 Roxel r = null;
@@ -89,5 +86,35 @@ public class Feeder implements InitializingBean, DisposableBean {
             }
         }
         return map;
+    }
+
+    private void createRandomCars(int amount) {
+        Random random = new Random();
+        List<String> colors = new ArrayList<String>(Arrays.asList("black", "blue", "green", "red", "white"));
+
+
+        for (; amount > 0; amount--) {
+            int x = random.nextInt(X_SIZE);
+            int y = random.nextInt(Y_SIZE);
+            Direction dir = Direction.EAST;
+
+            if (x % 2 == 0 && y % 2 == 0)
+            {
+                if(random.nextBoolean()){
+                    x = ((x+1)% X_SIZE);
+                    dir = Direction.EAST;
+                }else{
+                    y = ((y+1)% X_SIZE);
+                    dir = Direction.SOUTH;
+                }
+            }else if(x%2 != 0) {
+                dir = Direction.SOUTH;
+            }else{
+                dir = Direction.EAST;
+
+            }
+            Car car = new CarImpl(dir, x, y, colors.get(random.nextInt(colors.size() - 1)));
+            new Thread((new CarThread((CarImpl) car))).start();
+        }
     }
 }
