@@ -19,7 +19,7 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<properties>
-		<gsVersion>10.1.0-12600-RELEASE</gsVersion>
+		<gsVersion>8.0.6</gsVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.gigaspaces</groupId>
 			<artifactId>gs-openspaces</artifactId>
-			<version>10.1.0-12600-RELEASE</version>
+			<version>8.0.6</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -46,6 +46,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
+			<version>4.1.6.RELEASE</version>
 		</dependency>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -81,7 +82,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-openspaces-plugin</artifactId>
-				<version>10.1.0-12600-RELEASE</version>
+				<version>8.0.6</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -92,7 +93,7 @@
       <dependency>
         <groupId>com.gigaspaces</groupId>
         <artifactId>gs-openspaces</artifactId>
-        <version>10.1.0-12600-RELEASE</version>
+        <version>8.0.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
