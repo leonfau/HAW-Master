@@ -67,20 +67,22 @@ public class Feeder implements InitializingBean, DisposableBean {
         int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
         Roxel map[] = new Roxel[roxelCount];
         int i = 0;
+        int tilenr = 0;
         for (int currentX = 0; currentX <= X_SIZE; currentX++) {
             for (int currentY = 0; currentY <= Y_SIZE; currentY++) {
                 boolean xEqual = currentX % 2 == 0;
                 boolean yEqual = currentY % 2 == 0;
+                tilenr = currentX % 3;
                 Roxel r = null;
                 if (xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED);
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED, tilenr);
                 } else if (!xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH);
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
                 } else if (xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST);
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST, tilenr);
                 } else if (!xEqual && !yEqual) {
                     r = new Roxel(ROXEL_SIZE, currentX, currentY,
-                            Direction.TODECIDE);
+                            Direction.TODECIDE, tilenr);
                 }
                 r.setOccupiedBy(new EmptyCar());
                 map[i++] = r;
