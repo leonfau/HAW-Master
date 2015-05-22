@@ -125,12 +125,12 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     }
 
     private void initSpace(String url){
-        partitions = new GigaSpace [nrOfPartitions];
+  /*      partitions = new GigaSpace [nrOfPartitions];
         for (int i = 0; i < nrOfPartitions; i++) {
             UrlSpaceConfigurer spaceConfigurer = new UrlSpaceConfigurer("/./space"+ "?cluster_schema=partitioned-sync2backup&id="+(i+1)+"&total_members="+nrOfPartitions + ",0");
             partitions[i] = new GigaSpaceConfigurer(spaceConfigurer.space()).gigaSpace();
         }
-
+*/
         UrlSpaceConfigurer spaceConfigurer = new UrlSpaceConfigurer(url);
         this.spa = new GigaSpaceConfigurer(spaceConfigurer).gigaSpace();
 

@@ -24,16 +24,10 @@ public class CarThread implements Runnable {
 
     @Override
     public void run() {
-        Roxel currentRoxel;
-
-        currentRoxel = enterInitialRoxel(this.car.getInitX(), this.car.getInitY());
+        Roxel currentRoxel= enterInitialRoxel(this.car.getInitX(), this.car.getInitY());
         if (currentRoxel != null) {
             System.out.println(currentRoxel);
-            while (wantToMoveForward()) {
-                moveThroughCurrRoxel(currentRoxel);
-                currentRoxel = moveToNextRoxel(currentRoxel);
-                System.out.println(currentRoxel);
-            }
+            car.setRoxel(currentRoxel);
         }
     }
 
@@ -41,11 +35,6 @@ public class CarThread implements Runnable {
         Roxel r = null;
         r = takeByCoordinate(x, y);
         return r;
-    }
-
-
-    private boolean wantToMoveForward() {
-        return true;
     }
 
 
@@ -81,78 +70,4 @@ public class CarThread implements Runnable {
         }
         return next;
     }
-
-
-    private void moveThroughCurrRoxel(Roxel current) {
-        try {
-            Thread.sleep(10 * current.getLength());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Roxel moveToNextRoxel(Roxel current) {
-        try {
-            return takeNextRoxel(current, this.car.getDirection());
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Roxel takeNextRoxel(Roxel current, Direction direction) {
-        Roxel query = new Roxel();
-        query.setX(0);
-
-        int roxelMaxX = spa.count(query);
-        query.setX(null);
-        query.setY(0);
-        int roxelMaxY = spa.count(query);
-
-        switch (direction) {
-            case EAST:
-                query.setX((current.getX() + 1) % roxelMaxX);
-                query.setY(current.getY());
-                break;
-            case SOUTH:
-                query.setX(current.getX());
-                query.setY((current.getY() + 1) % roxelMaxY);
-                break;
-            default:
-
-        }
-        query.setOccupiedBy(new EmptyCar());
-
-        Roxel next = null;
-        try {
-            PlatformTransactionManager ptm = new DistributedJiniTxManagerConfigurer().transactionManager();
-            DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
-            TransactionStatus ts = ptm.getTransaction(definition);
-            try {
-                next = spa.take(query, MAX_BLOCK);
-                if (next == null) {
-//                    throw new RoxelNotFoundException("roxel not found");
-                    return null;
-                }
-                Car c = current.getOccupiedBy();
-                next.setOccupiedBy(c);
-                spa.write(next);
-
-                current.setOccupiedBy(new EmptyCar());
-                spa.write(current);
-                spa.write(next);
-
-            } catch (Exception e) {
-                ptm.rollback(ts);
-                throw e;
-            }
-            ptm.commit(ts);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return next;
-    }
-
 }

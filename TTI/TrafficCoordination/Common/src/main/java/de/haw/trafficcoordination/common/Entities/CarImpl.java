@@ -2,7 +2,7 @@ package de.haw.trafficcoordination.common.Entities;
 
 import com.gigaspaces.annotation.pojo.SpaceClass;
 import com.gigaspaces.annotation.pojo.SpaceProperty;
-
+import org.openspaces.events.EventTemplate;
 
 @SpaceClass
 public class CarImpl implements Car {
@@ -16,6 +16,7 @@ public class CarImpl implements Car {
     private int initX;
     private int initY;
     private String color = "";
+    private Roxel roxel;
 
 
     // default constructor, required
@@ -44,6 +45,14 @@ public class CarImpl implements Car {
         Roxel r = null;
         //	r = spa.takeByCoordinate(x, y, this);
         return null;
+    }
+
+    public Roxel getRoxel() {
+        return roxel;
+    }
+
+    public void setRoxel(Roxel roxel) {
+        this.roxel = roxel;
     }
 
     public int getInitX() {
