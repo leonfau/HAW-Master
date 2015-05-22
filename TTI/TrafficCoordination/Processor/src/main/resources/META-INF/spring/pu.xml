@@ -39,14 +39,15 @@
         The data processor bean
     -->
     <bean id="carMover" class="de.haw.trafficcoordination.processor.CarMover" depends-on="gigaSpace"/>
-    <bean id="car" class="    de.haw.trafficcoordination.common.Entities.CarImpl" depends-on="gigaSpace"/>
+
 
 
     <os-events:notify-container id="carMoverContainer" giga-space="gigaSpace">
         <os-events:notify lease-expire="true"/>
 
         <os-events:tx-support tx-manager="transactionManager"/>
-        <os-core:template ref="car"/>
+        <os-core:sql-query where="direction is not null" class="de.haw.trafficcoordination.common.Entities.CarImpl"/>
+
         <os-events:listener>
             <os-events:annotation-adapter update-or-write="false">
                 <os-events:delegate ref="carMover"/>

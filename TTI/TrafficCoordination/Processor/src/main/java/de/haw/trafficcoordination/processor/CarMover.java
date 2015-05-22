@@ -30,13 +30,20 @@ public class CarMover {
     @SpaceDataEvent
     public void moveCarListener(CarImpl car) {
         if (car != null) {
+            System.out.println("--------------------");
+            System.out.println("--------------------");
+            System.out.println("--------------------");
+            System.out.println("--------------------");
             this.driveToNextRoxel(car);
+            spa.write(car, 20);
         }
     }
 
     public void driveToNextRoxel(CarImpl car) {
         Roxel roxel = this.takeNextRoxel(car.getRoxel(), car.getDirection());
         car.setRoxel(roxel);
+        spa.write(car, 20);
+
     }
 
     public Roxel takeNextRoxel(Roxel current, Direction direction) {
@@ -75,10 +82,8 @@ public class CarMover {
                 }
                 Car c = current.getOccupiedBy();
                 next.setOccupiedBy(c);
-                spa.write(next);
-
                 current.setOccupiedBy(new EmptyCar());
-                spa.write(current, 30 );
+                spa.write(current);
                 spa.write(next);
 
             } catch (Exception e) {

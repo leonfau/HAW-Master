@@ -10,6 +10,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class CarThread implements Runnable {
+    //@TODO: Cars müssen in den Space mit Lease Time geschrieben werden.
     CarImpl car;
     private GigaSpace spa;
     private final static String URL = "jini://*/*/space";
@@ -28,6 +29,7 @@ public class CarThread implements Runnable {
         if (currentRoxel != null) {
             System.out.println(currentRoxel);
             car.setRoxel(currentRoxel);
+            spa.write(car, 20);
         }
     }
 
@@ -53,6 +55,7 @@ public class CarThread implements Runnable {
             try {
                 next = spa.take(query, MAX_BLOCK);
                 if (next == null) {
+                    System.out.println("Next null");
 //                    throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " + query.getY());
                     return null;
                 }

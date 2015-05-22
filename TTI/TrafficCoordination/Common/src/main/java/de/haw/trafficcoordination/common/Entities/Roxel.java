@@ -5,8 +5,10 @@ import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 import com.gigaspaces.annotation.pojo.SpaceProperty;
 
+import java.io.Serializable;
+
 @SpaceClass
-public class Roxel {
+public class Roxel implements Serializable {
 
 	private Integer length;
 	private Integer x;
@@ -29,7 +31,6 @@ public class Roxel {
 		this.direction = direction;
 		this.tileNR = tileNR;
 		this.occupiedBy = new EmptyCar();
-		//this.isOccupied = false;
 	}
 
 	@SpaceId(autoGenerate = true)
