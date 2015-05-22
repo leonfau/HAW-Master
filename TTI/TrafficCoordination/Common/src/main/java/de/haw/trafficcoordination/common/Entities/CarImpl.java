@@ -85,6 +85,14 @@ public class CarImpl implements Car {
         return null;
     }
 
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
     @Override
     public int hashCode() {
         return 1;

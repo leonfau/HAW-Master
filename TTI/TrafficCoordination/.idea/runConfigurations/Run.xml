@@ -27,6 +27,7 @@
               <option value="clean" />
               <option value="package" />
               <option value="os:run" />
+              <option value="-X" />
             </list>
           </option>
           <option name="profilesMap">
