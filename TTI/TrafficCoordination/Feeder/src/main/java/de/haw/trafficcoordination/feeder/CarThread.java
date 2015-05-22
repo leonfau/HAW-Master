@@ -27,10 +27,10 @@ public class CarThread implements Runnable {
     public void run() {
         Roxel currentRoxel= enterInitialRoxel(this.car.getInitX(), this.car.getInitY());
         if (currentRoxel != null) {
-            System.out.println(currentRoxel);
             car.setRoxel(currentRoxel);
-            spa.write(car, 20);
         }
+        spa.write(car, 20);
+
     }
 
     private Roxel enterInitialRoxel(int x, int y) {
@@ -53,7 +53,7 @@ public class CarThread implements Runnable {
             DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
-                next = spa.takeIfExists(query, MAX_BLOCK);
+                next = spa.take(query, MAX_BLOCK);
                 if (next == null) {
                     System.out.println("Next null");
 //                    throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " + query.getY());

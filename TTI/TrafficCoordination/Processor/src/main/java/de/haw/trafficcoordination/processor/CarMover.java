@@ -41,7 +41,9 @@ public class CarMover {
 
     public void driveToNextRoxel(CarImpl car) {
         Roxel roxel = this.takeNextRoxel(car.getRoxel(), car.getDirection());
-        car.setRoxel(roxel);
+        if (roxel != null) {
+            car.setRoxel(roxel);
+        }
         spa.write(car, 20);
 
     }
