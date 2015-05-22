@@ -37,10 +37,10 @@ public class Feeder implements InitializingBean, DisposableBean {
 
     private ScheduledFuture<?> sf;
     private ScheduledExecutorService executorService;
-    private static final int X_SIZE = 30;
-    private static final int Y_SIZE = 30;
+    private static final int X_SIZE = 20;
+    private static final int Y_SIZE = 20;
     private static final int ROXEL_SIZE = 50;
-    private static final int CAR_AMOUNT = 0;
+    private static final int CAR_AMOUNT = 40;
 
 
     @GigaSpaceContext
@@ -66,12 +66,12 @@ public class Feeder implements InitializingBean, DisposableBean {
 
 
     private Roxel[] createMap() {
-        int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
+        int roxelCount = (X_SIZE) * (Y_SIZE);
         Roxel map[] = new Roxel[roxelCount];
         int i = 0;
         int tilenr = 0;
-        for (int currentX = 0; currentX <= X_SIZE; currentX++) {
-            for (int currentY = 0; currentY <= Y_SIZE; currentY++) {
+        for (int currentX = 0; currentX < X_SIZE; currentX++) {
+            for (int currentY = 0; currentY < Y_SIZE; currentY++) {
                 int xPos = currentX % 3;
                 int yPos = currentY & 3;
                 Roxel r = null;
@@ -81,61 +81,13 @@ public class Feeder implements InitializingBean, DisposableBean {
                     } else {
                         r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
                     }
-                } else if (xPos != 2) {
+                } else
+                    if (xPos != 2) {
                     r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST, tilenr);
                 } else {
                     r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.TODECIDE, tilenr);
                 }
 
-
-/*
-                boolean xEqual = currentX % 2 == 0;
-                boolean yEqual = currentY % 2 == 0;
-<<<<<<< HEAD
-                //tilenr = currentX % 3;
-=======
-              //  tilenr = currentX % 3;
-                Roxel r = null;
-                if (xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED, tilenr);
-                } else if (!xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
-                } else if (xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST, tilenr);
-                } else if (!xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY,
-                            Direction.TODECIDE, tilenr);
-                }
-                r.setOccupiedBy(new EmptyCar());
-                map[i++] = r;
-            }
-        }
-        return map;
-    }
-
-    private Roxel[] createNewMap() {
-        int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
-        Roxel map[] = new Roxel[roxelCount];
-        int i = 0;
-        int tilenr = 0;
-        for (int currentX = 0; currentX <= X_SIZE; currentX++) {
-            for (int currentY = 0; currentY <= Y_SIZE; currentY++) {
-                boolean xEqual = currentX % 2 == 0;
-                boolean yEqual = currentY % 2 == 0;
-                //  tilenr = currentX % 3;
->>>>>>> 2958b0dfa7776d34e6e4426e85103eec4b6400eb
-                Roxel r = null;
-                if (xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED, tilenr);
-                } else if (!xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
-                } else if (xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST, tilenr);
-                } else if (!xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY,
-                            Direction.TODECIDE, tilenr);
-                }
-                */
                 r.setOccupiedBy(new EmptyCar());
                 map[i++] = r;
             }
@@ -151,27 +103,27 @@ public class Feeder implements InitializingBean, DisposableBean {
             int y = random.nextInt(Y_SIZE);
             Direction dir = null;
 
-            while (x % 3 == 0 && y % 3 == 0)
+            while (x % 3 != 0)
             {
-                if(random.nextBoolean()){
-                    x = ((x-1)% X_SIZE);
-                }else{
-                    y = ((y+1)% Y_SIZE);
-                }
+                x = random.nextInt(X_SIZE);
+            }
+            
+            while (y % 3 != 0) {
+                y = random.nextInt(Y_SIZE);
             }
 
-            if(x%3 != 0) {
+            if(random.nextBoolean()) {
                 dir = Direction.SOUTH;
             }else{
                 dir = Direction.EAST;
 
             }
+            x--;
+            y--;
+
 
             Car car = new CarImpl(dir, x, y, colors.get(random.nextInt(colors.size() - 1)));
-            new Thread((new CarThread((CarImpl) car))).start();
 
-<<<<<<< HEAD
-=======
 
             log.info("--- Starting Car Thread with delay " + "");
 
@@ -179,7 +131,6 @@ public class Feeder implements InitializingBean, DisposableBean {
             CarThread thread = new CarThread((CarImpl) car);
             this.sf = this.executorService.scheduleAtFixedRate(thread, 20, 20,
                     TimeUnit.MILLISECONDS);
->>>>>>> 2958b0dfa7776d34e6e4426e85103eec4b6400eb
         }
     }
 }
