@@ -73,7 +73,7 @@ public class Feeder implements InitializingBean, DisposableBean {
         for (int currentX = 0; currentX < X_SIZE; currentX++) {
             for (int currentY = 0; currentY < Y_SIZE; currentY++) {
                 int xPos = currentX % 3;
-                int yPos = currentY & 3;
+                int yPos = currentY % 3;
                 Roxel r = null;
                 if (yPos != 2) {
                     if (xPos != 2) {
