@@ -53,7 +53,7 @@ public class CarThread implements Runnable {
             DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
-                next = spa.take(query, MAX_BLOCK);
+                next = spa.takeIfExists(query, MAX_BLOCK);
                 if (next == null) {
                     System.out.println("Next null");
 //                    throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " + query.getY());

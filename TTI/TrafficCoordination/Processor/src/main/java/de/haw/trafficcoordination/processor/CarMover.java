@@ -75,7 +75,7 @@ public class CarMover {
             DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
-                next = spa.take(query, MAX_BLOCK);
+                next = spa.takeIfExists(query, MAX_BLOCK);
                 if (next == null) {
 //                    throw new RoxelNotFoundException("roxel not found");
                     return null;
