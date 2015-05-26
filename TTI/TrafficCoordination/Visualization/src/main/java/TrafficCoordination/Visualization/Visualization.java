@@ -30,13 +30,14 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     @Override
     public void init(GameContainer gc) throws SlickException {
         map = this.fetchFullMap();
+        cars = fetchCars();
         System.out.println("Roxel: " + map.length);
 
     }
 
     @Override
     public void update(GameContainer gc, int i) throws SlickException {
-        // TODO Call logic
+        cars = this.fetchCars();
 
     }
 
@@ -90,15 +91,12 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
                 System.out.println("img null");
             }
         }
-
+        System.out.println(cars.length);
+        System.out.println(map.length);
+        System.out.println(map.length);
     }
 
     public void render(GameContainer gc, Graphics g) throws SlickException {
-        // @TODO: nur noch in init, nur noch autos abfragen
-
-        cars = this.fetchCars();
-
-        //System.out.println(cars.length);
 
         this.drawMap();
     }
@@ -125,7 +123,8 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     }
 
     private void initSpace(String url){
-  /*      partitions = new GigaSpace [nrOfPartitions];
+  /*
+        partitions = new GigaSpace [nrOfPartitions];
         for (int i = 0; i < nrOfPartitions; i++) {
             UrlSpaceConfigurer spaceConfigurer = new UrlSpaceConfigurer("/./space"+ "?cluster_schema=partitioned-sync2backup&id="+(i+1)+"&total_members="+nrOfPartitions + ",0");
             partitions[i] = new GigaSpaceConfigurer(spaceConfigurer.space()).gigaSpace();

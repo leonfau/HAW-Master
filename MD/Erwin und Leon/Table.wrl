@@ -1,0 +1,163 @@
+#VRML V2.0 utf8
+
+#Created with V-Realm Builder v2.0
+#Integrated Data Systems Inc.
+#www.ids-net.com
+
+
+DirectionalLight {
+	direction	0 0 -1
+}
+DEF CornerR Transform {
+	translation	9 -0.2 0.26
+	rotation	1 0 0  1.5708
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				diffuseColor	0.41468 0.45568 0.8
+			}
+
+		}
+
+		geometry	Cylinder {
+			height	0.5
+			radius	0.2
+		}
+
+	}
+}
+DEF Viewpoint2 Viewpoint {
+	fieldOfView	1.19
+	orientation	1 0 0  0.973894
+	position	5 -5 5.2
+	description	"pos2"
+}
+DEF Ball Transform {
+	translation	4 5 0.25
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				diffuseColor	0.96 0.383953 0.213965
+			}
+
+			texture	NULL
+		}
+
+		geometry	Sphere {
+			radius	0.25
+		}
+
+	}
+}
+DEF wall3 Transform {
+	translation	11.55 -0.1 0.25
+	rotation	0 0 1  1.37357
+	center	-2.55 0 0
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				ambientIntensity	0.2
+				diffuseColor	0.164103 0.289988 0.8
+			}
+
+		}
+
+		geometry	Box {
+			size	5.1 0.2 0.5
+		}
+
+	}
+}
+DEF wall1 Transform {
+	translation	3.535 4.9 0.25
+	rotation	0 0 -1  0.785398
+	center	-3.535 0 0
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				diffuseColor	0.287337 0.349154 0.8
+			}
+
+		}
+
+		geometry	Box {
+			size	7.07 0.2 0.5
+		}
+
+	}
+}
+DEF wall2 Transform {
+	translation	7 -0.1 0.25
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				ambientIntensity	0.2
+				diffuseColor	0.208439 0.253807 0.7
+			}
+
+		}
+
+		geometry	Box {
+			size	4 0.2 0.5
+		}
+
+	}
+}
+DEF Viewpoint1 Viewpoint {
+	fieldOfView	1.6
+	jump	TRUE
+	position	5 5 7
+	description	"pos1"
+}
+DEF Ground Transform {
+	translation	5 4.8 0
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				diffuseColor	0.072184 0.54 0.174253
+			}
+
+		}
+
+		geometry	Box {
+			size	10 10 0.01
+		}
+
+	}
+}
+DEF Obstacle Transform {
+	translation	6 2.5 0.2
+	rotation	1 0 0  1.5708
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				diffuseColor	0.877134 0.89 0.394239
+			}
+
+		}
+
+		geometry	Cylinder {
+			height	0.5
+			radius	0.8
+		}
+
+	}
+}
+DEF CornerL Transform {
+	translation	5 -0.2 0.26
+	rotation	1 0 0  1.5708
+	children Shape {
+		appearance	Appearance {
+			material	Material {
+				diffuseColor	0.446803 0.468525 0.8
+			}
+
+		}
+
+		geometry	Cylinder {
+			height	0.5
+			radius	0.2
+		}
+
+	}
+}

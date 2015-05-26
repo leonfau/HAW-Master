@@ -40,7 +40,7 @@ public class Feeder implements InitializingBean, DisposableBean {
     private static final int X_SIZE = 20;
     private static final int Y_SIZE = 20;
     private static final int ROXEL_SIZE = 50;
-    private static final int CAR_AMOUNT = 12;
+    private static final int CAR_AMOUNT = 40;
 
 
     @GigaSpaceContext
@@ -66,54 +66,28 @@ public class Feeder implements InitializingBean, DisposableBean {
 
 
     private Roxel[] createMap() {
-        int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
+        int roxelCount = (X_SIZE) * (Y_SIZE);
         Roxel map[] = new Roxel[roxelCount];
         int i = 0;
         int tilenr = 0;
-        for (int currentX = 0; currentX <= X_SIZE; currentX++) {
-            for (int currentY = 0; currentY <= Y_SIZE; currentY++) {
-                boolean xEqual = currentX % 2 == 0;
-                boolean yEqual = currentY % 2 == 0;
-              //  tilenr = currentX % 3;
+        for (int currentX = 0; currentX < X_SIZE; currentX++) {
+            for (int currentY = 0; currentY < Y_SIZE; currentY++) {
+                int xPos = currentX % 3;
+                int yPos = currentY % 3;
                 Roxel r = null;
-                if (xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED, tilenr);
-                } else if (!xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
-                } else if (xEqual && !yEqual) {
+                if (yPos != 2) {
+                    if (xPos != 2) {
+                        r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED, tilenr);
+                    } else {
+                        r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
+                    }
+                } else
+                    if (xPos != 2) {
                     r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST, tilenr);
-                } else if (!xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY,
-                            Direction.TODECIDE, tilenr);
+                } else {
+                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.TODECIDE, tilenr);
                 }
-                r.setOccupiedBy(new EmptyCar());
-                map[i++] = r;
-            }
-        }
-        return map;
-    }
 
-    private Roxel[] createNewMap() {
-        int roxelCount = (X_SIZE + 1) * (Y_SIZE + 1);
-        Roxel map[] = new Roxel[roxelCount];
-        int i = 0;
-        int tilenr = 0;
-        for (int currentX = 0; currentX <= X_SIZE; currentX++) {
-            for (int currentY = 0; currentY <= Y_SIZE; currentY++) {
-                boolean xEqual = currentX % 2 == 0;
-                boolean yEqual = currentY % 2 == 0;
-                //  tilenr = currentX % 3;
-                Roxel r = null;
-                if (xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.BLOCKED, tilenr);
-                } else if (!xEqual && yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.SOUTH, tilenr);
-                } else if (xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY, Direction.EAST, tilenr);
-                } else if (!xEqual && !yEqual) {
-                    r = new Roxel(ROXEL_SIZE, currentX, currentY,
-                            Direction.TODECIDE, tilenr);
-                }
                 r.setOccupiedBy(new EmptyCar());
                 map[i++] = r;
             }
@@ -124,31 +98,31 @@ public class Feeder implements InitializingBean, DisposableBean {
     private void createRandomCars(int amount) {
         Random random = new Random();
         List<String> colors = new ArrayList<String>(Arrays.asList("black", "blue", "green", "red", "white"));
-
-
         for (; amount > 0; amount--) {
             int x = random.nextInt(X_SIZE);
             int y = random.nextInt(Y_SIZE);
             Direction dir = null;
 
-            while (x % 2 == 0 && y % 2 == 0)
+            while (x % 3 != 0)
             {
-                if(random.nextBoolean()){
-                    x = ((x+1)% X_SIZE);
-                }else{
-                    y = ((y+1)% X_SIZE);
-                }
+                x = random.nextInt(X_SIZE);
+            }
+            
+            while (y % 3 != 0) {
+                y = random.nextInt(Y_SIZE);
             }
 
-            if(x%2 != 0) {
+            if(random.nextBoolean()) {
                 dir = Direction.SOUTH;
             }else{
                 dir = Direction.EAST;
 
             }
+            x--;
+            y--;
+
 
             Car car = new CarImpl(dir, x, y, colors.get(random.nextInt(colors.size() - 1)));
-            new Thread((new CarThread((CarImpl) car))).start();
 
 
             log.info("--- Starting Car Thread with delay " + "");
