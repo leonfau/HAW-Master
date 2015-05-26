@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:os-core="http://www.openspaces.org/schema/core"
        xmlns:os-events="http://www.openspaces.org/schema/events"
-       xmlns:os-remoting="http://www.openspaces.org/schema/remoting"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-       http://www.openspaces.org/schema/core http://www.openspaces.org/schema/10.0/core/openspaces-core.xsd
-       http://www.openspaces.org/schema/events http://www.openspaces.org/schema/10.0/events/openspaces-events.xsd
-       http://www.openspaces.org/schema/remoting http://www.openspaces.org/schema/10.0/remoting/openspaces-remoting.xsd">
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.openspaces.org/schema/core http://www.openspaces.org/schema/8.0/core/openspaces-core.xsd
+       http://www.openspaces.org/schema/events http://www.openspaces.org/schema/8.0/events/openspaces-events.xsd">
 
     <!--
         Spring property configurer which allows us to use system properties (such as user.name).
@@ -40,25 +38,20 @@
     <!--
         The data processor bean
     -->
-    <bean id="dataProcessor" class="de.haw.trafficcoordination.processor.Processor"/>
+    <bean id="carMover" class="de.haw.trafficcoordination.processor.CarMover" depends-on="gigaSpace"/>
 
-    <!--
-        A polling event container that perfoms (by default) polling take operations against
-        the space using the provided template (in our case, and the non processed data objects).
-        Once a match is found, the data processor bean event listener is triggered using the
-        annotation adapter.
-    -->
-    <!--<os-events:polling-container id="dataProcessorPollingEventContainer" giga-space="gigaSpace">-->
-        <!--<os-events:tx-support tx-manager="transactionManager"/>-->
-        <!--<os-core:template>-->
-            <!--&lt;!&ndash;<bean class="de.haw.trafficcoordination.common.Data">&ndash;&gt;-->
-                <!--&lt;!&ndash;<property name="processed" value="false"/>&ndash;&gt;-->
-            <!--&lt;!&ndash;</bean>&ndash;&gt;-->
-        <!--</os-core:template>-->
-        <!--<os-events:listener>-->
-            <!--<os-events:annotation-adapter>-->
-                <!--<os-events:delegate ref="dataProcessor"/>-->
-            <!--</os-events:annotation-adapter>-->
-        <!--</os-events:listener>-->
-    <!--</os-events:polling-container>-->
+
+
+    <os-events:notify-container id="carMoverContainer" giga-space="gigaSpace">
+        <os-events:notify lease-expire="true"/>
+
+        <os-events:tx-support tx-manager="transactionManager"/>
+        <os-core:sql-query where="direction is not null" class="de.haw.trafficcoordination.common.Entities.CarImpl"/>
+
+        <os-events:listener>
+            <os-events:annotation-adapter update-or-write="false">
+                <os-events:delegate ref="carMover"/>
+            </os-events:annotation-adapter>
+        </os-events:listener>
+    </os-events:notify-container>
 </beans>
