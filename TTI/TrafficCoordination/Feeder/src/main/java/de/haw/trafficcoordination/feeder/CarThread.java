@@ -10,11 +10,10 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class CarThread implements Runnable {
-    //@TODO: Cars müssen in den Space mit Lease Time geschrieben werden.
     CarImpl car;
     private GigaSpace spa;
     private final static String URL = "jini://*/*/space";
-    private final int MAX_BLOCK = 500000;
+    private final static int MAX_BLOCK = 500000;
 
 
     public CarThread(CarImpl car) {
@@ -25,17 +24,13 @@ public class CarThread implements Runnable {
 
     @Override
     public void run() {
-        Roxel currentRoxel= enterInitialRoxel(this.car.getInitX(), this.car.getInitY());
-        if (currentRoxel != null) {
-            car.setRoxel(currentRoxel);
-        }
-        spa.write(car, 20);
-
+        enterInitialRoxel(this.car.getInitX(), this.car.getInitY());
     }
 
     private Roxel enterInitialRoxel(int x, int y) {
         Roxel r = null;
         r = takeByCoordinate(x, y);
+
         return r;
     }
 
@@ -53,15 +48,24 @@ public class CarThread implements Runnable {
             DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
-                next = spa.take(query, MAX_BLOCK);
+                next = spa.takeIfExists(query, MAX_BLOCK);
                 if (next == null) {
-                    System.out.println("Next null");
+               //     System.out.println("Init Roxel not found");
 //                    throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " + query.getY());
                     return null;
                 }
                 next.setOccupiedBy(car);
-                spa.write(next);
 
+                Roxel current = car.getRoxel();
+                if (current != null) {
+                    current.setOccupiedBy(new EmptyCar());
+                    spa.write(current);
+                }
+
+                System.out.println("Init Roxel: " +x +":" + y);
+                car.setRoxel(next);
+                spa.write(next);
+                spa.write(car, 20);
             } catch (Exception e) {
                 ptm.rollback(ts);
                 throw e;

@@ -40,7 +40,7 @@ public class Feeder implements InitializingBean, DisposableBean {
     private static final int X_SIZE = 20;
     private static final int Y_SIZE = 20;
     private static final int ROXEL_SIZE = 50;
-    private static final int CAR_AMOUNT = 40;
+    private static final int CAR_AMOUNT = 30;
 
 
     @GigaSpaceContext
@@ -129,8 +129,9 @@ public class Feeder implements InitializingBean, DisposableBean {
 
             this.executorService = Executors.newScheduledThreadPool(1);
             CarThread thread = new CarThread((CarImpl) car);
-            this.sf = this.executorService.scheduleAtFixedRate(thread, 20, 20,
-                    TimeUnit.MILLISECONDS);
+            (new Thread(thread)).start();
+         //   this.sf = this.executorService.scheduleAtFixedRate(thread, 20, 20,
+         //           TimeUnit.MILLISECONDS);
         }
     }
 }

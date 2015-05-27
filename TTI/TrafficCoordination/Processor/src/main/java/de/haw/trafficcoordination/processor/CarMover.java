@@ -35,20 +35,14 @@ public class CarMover {
             System.out.println("--------------------");
             System.out.println("--------------------");
             this.driveToNextRoxel(car);
-            spa.write(car, 20);
         }
     }
 
     public void driveToNextRoxel(CarImpl car) {
-        Roxel roxel = this.takeNextRoxel(car.getRoxel(), car.getDirection());
-        if (roxel != null) {
-            car.setRoxel(roxel);
-        }
-        spa.write(car, 20);
-
+        this.takeNextRoxel(car);
     }
 
-    public Roxel takeNextRoxel(Roxel current, Direction direction) {
+    public Roxel takeNextRoxel(CarImpl car) {
         Roxel query = new Roxel();
         query.setX(0);
 
@@ -57,7 +51,8 @@ public class CarMover {
         query.setY(0);
         int roxelMaxY = spa.count(query);
 
-        switch (direction) {
+        Roxel current = car.getRoxel();
+        switch (car.getDirection()) {
             case EAST:
                 query.setX((current.getX() + 1) % roxelMaxX);
                 query.setY(current.getY());
@@ -79,14 +74,19 @@ public class CarMover {
             try {
                 next = spa.takeIfExists(query, MAX_BLOCK);
                 if (next == null) {
+                    System.out.println("Processor: next not found");
 //                    throw new RoxelNotFoundException("roxel not found");
                     return null;
                 }
-                Car c = current.getOccupiedBy();
-                next.setOccupiedBy(c);
+                current.getOccupiedBy();
+                car.setRoxel(next);
+                next.setOccupiedBy(car);
                 current.setOccupiedBy(new EmptyCar());
+
+                System.out.println("Next Roxel: " + next.getX() + ":" + next.getY());
                 spa.write(current);
                 spa.write(next);
+                spa.write(car, 20);
 
             } catch (Exception e) {
                 ptm.rollback(ts);
