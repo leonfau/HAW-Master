@@ -91,9 +91,6 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
                 System.out.println("img null");
             }
         }
-        System.out.println(cars.length);
-        System.out.println(map.length);
-        System.out.println(map.length);
     }
 
     public void render(GameContainer gc, Graphics g) throws SlickException {

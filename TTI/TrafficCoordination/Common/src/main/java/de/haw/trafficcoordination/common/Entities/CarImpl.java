@@ -1,8 +1,9 @@
 package de.haw.trafficcoordination.common.Entities;
 
 import com.gigaspaces.annotation.pojo.SpaceClass;
+import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceProperty;
-
+import org.openspaces.events.EventTemplate;
 
 @SpaceClass
 public class CarImpl implements Car {
@@ -16,10 +17,21 @@ public class CarImpl implements Car {
     private int initX;
     private int initY;
     private String color = "";
+    private Roxel roxel;
+    private String id;
 
 
     // default constructor, required
     public CarImpl() {
+    }
+
+    @SpaceId(autoGenerate = true)
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id){
+        this.id = id;
     }
 
     public CarImpl(Direction dir, int initX, int initY, String color) {
@@ -44,6 +56,14 @@ public class CarImpl implements Car {
         Roxel r = null;
         //	r = spa.takeByCoordinate(x, y, this);
         return null;
+    }
+
+    public Roxel getRoxel() {
+        return roxel;
+    }
+
+    public void setRoxel(Roxel roxel) {
+        this.roxel = roxel;
     }
 
     public int getInitX() {
@@ -74,6 +94,14 @@ public class CarImpl implements Car {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     @Override
