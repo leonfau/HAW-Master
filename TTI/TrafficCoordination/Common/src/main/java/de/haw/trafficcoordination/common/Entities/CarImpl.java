@@ -20,6 +20,8 @@ public class CarImpl implements Car {
     private Roxel roxel;
     private String id;
 
+    private final long roxelTimeInMs = 200;
+
 
     // default constructor, required
     public CarImpl() {
@@ -102,6 +104,10 @@ public class CarImpl implements Car {
 
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    public long getRoxelTimeInMs() {
+        return roxelTimeInMs;
     }
 
     @Override

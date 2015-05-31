@@ -2,6 +2,7 @@ package de.haw.trafficcoordination.feeder;
 
 
 import de.haw.trafficcoordination.common.Entities.*;
+import net.jini.core.lease.Lease;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.context.GigaSpaceContext;
 
@@ -51,9 +52,7 @@ public class Feeder implements InitializingBean, DisposableBean {
         log.info("--- Create World Map");
         executorService = Executors.newScheduledThreadPool(1);
         Roxel[] map = this.createMap();
-        log.info("---" + map.length + " Roxel");
-        gigaSpace.writeMultiple(map);
-        log.info(gigaSpace.readMultiple(new Roxel()).length + " found");
+        gigaSpace.writeMultiple(map, Lease.FOREVER);
 
         this.createRandomCars(CAR_AMOUNT);
     }
@@ -130,6 +129,7 @@ public class Feeder implements InitializingBean, DisposableBean {
             this.executorService = Executors.newScheduledThreadPool(1);
             CarThread thread = new CarThread((CarImpl) car);
             (new Thread(thread)).start();
+
          //   this.sf = this.executorService.scheduleAtFixedRate(thread, 20, 20,
          //           TimeUnit.MILLISECONDS);
         }

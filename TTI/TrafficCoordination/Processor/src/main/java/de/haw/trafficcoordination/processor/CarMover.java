@@ -1,44 +1,32 @@
 package de.haw.trafficcoordination.processor;
 
+import com.j_spaces.core.LeaseContext;
 import de.haw.trafficcoordination.common.Entities.*;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.context.GigaSpaceContext;
 import org.openspaces.core.transaction.manager.DistributedJiniTxManagerConfigurer;
 import org.openspaces.events.EventDriven;
 import org.openspaces.events.adapter.SpaceDataEvent;
+import org.openspaces.events.notify.Notify;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.rmi.dgc.Lease;
+import java.util.Date;
 import java.util.logging.Logger;
 
-/**
- * The processor simulates work done no un-processed Data object. The processData
- * accepts a Data object, simulate work by sleeping, and then sets the processed
- * flag to true and returns the processed Data.
- */
 @EventDriven
 public class CarMover {
 
     Logger log = Logger.getLogger(this.getClass().getName());
-    private final static int MAX_BLOCK = 500000;
-
 
     @GigaSpaceContext
     private GigaSpace spa;
 
     @SpaceDataEvent
     public void moveCarListener(CarImpl car) {
-        if (car != null) {
-            System.out.println("--------------------");
-            System.out.println("--------------------");
-            System.out.println("--------------------");
-            System.out.println("--------------------");
-            this.driveToNextRoxel(car);
-        }
-    }
-
-    public void driveToNextRoxel(CarImpl car) {
+        log.info(car.getId() + " + Event Received");
         this.takeNextRoxel(car);
     }
 
@@ -72,9 +60,11 @@ public class CarMover {
             DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
-                next = spa.takeIfExists(query, MAX_BLOCK);
+                next = spa.takeIfExists(query);
                 if (next == null) {
                     System.out.println("Processor: next not found");
+                    spa.write(car, car.getRoxelTimeInMs());
+
 //                    throw new RoxelNotFoundException("roxel not found");
                     return null;
                 }
@@ -83,10 +73,14 @@ public class CarMover {
                 next.setOccupiedBy(car);
                 current.setOccupiedBy(new EmptyCar());
 
-                System.out.println("Next Roxel: " + next.getX() + ":" + next.getY());
-                spa.write(current);
-                spa.write(next);
-                spa.write(car, 20);
+          //      System.out.println("Next Roxel: " + next.getX() + ":" + next.getY());
+                spa.write(current, net.jini.core.lease.Lease.FOREVER);
+                spa.write(next, net.jini.core.lease.Lease.FOREVER);
+
+                LeaseContext<CarImpl> o = spa.write(car, 100);
+                String UID = o.getUID();
+                System.out.println("Current Date:" + new Date(System.currentTimeMillis()) + " Lease Expiration Date:" + new Date(o.getExpiration()));
+
 
             } catch (Exception e) {
                 ptm.rollback(ts);

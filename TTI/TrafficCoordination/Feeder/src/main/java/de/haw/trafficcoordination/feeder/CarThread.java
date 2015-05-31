@@ -1,5 +1,6 @@
 package de.haw.trafficcoordination.feeder;
 
+import com.j_spaces.core.LeaseContext;
 import de.haw.trafficcoordination.common.Entities.*;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
@@ -9,11 +10,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.rmi.dgc.Lease;
+import java.util.Date;
+
 public class CarThread implements Runnable {
     CarImpl car;
     private GigaSpace spa;
     private final static String URL = "jini://*/*/space";
-    private final static int MAX_BLOCK = 500000;
+    private final static int MAX_BLOCK = 5000;
 
 
     public CarThread(CarImpl car) {
@@ -27,32 +31,25 @@ public class CarThread implements Runnable {
         enterInitialRoxel(this.car.getInitX(), this.car.getInitY());
     }
 
-    private Roxel enterInitialRoxel(int x, int y) {
-        Roxel r = null;
-        r = takeByCoordinate(x, y);
-
-        return r;
-    }
-
 
     //---------Space
 
-    public Roxel takeByCoordinate(int x, int y) {
+    public void enterInitialRoxel(int x, int y) {
         Roxel query = new Roxel();
         query.setX(x);
         query.setY(y);
         query.setOccupiedBy(new EmptyCar());
-        Roxel next = null;
         try {
             PlatformTransactionManager ptm = new DistributedJiniTxManagerConfigurer().transactionManager();
             DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
-                next = spa.takeIfExists(query, MAX_BLOCK);
+                Roxel next = spa.takeIfExists(query);
                 if (next == null) {
-               //     System.out.println("Init Roxel not found");
+
+                    //     System.out.println("Init Roxel not found");
 //                    throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " + query.getY());
-                    return null;
+                    return;
                 }
                 next.setOccupiedBy(car);
 
@@ -62,10 +59,14 @@ public class CarThread implements Runnable {
                     spa.write(current);
                 }
 
-                System.out.println("Init Roxel: " +x +":" + y);
+                System.out.println("Init Roxel: " + x + ":" + y);
                 car.setRoxel(next);
-                spa.write(next);
-                spa.write(car, 20);
+                spa.write(next, net.jini.core.lease.Lease.FOREVER);
+
+                LeaseContext<CarImpl> o = spa.write(car, car.getRoxelTimeInMs());
+                String UID = o.getUID();
+                System.out.println("Current Date:"+ new Date(System.currentTimeMillis()) + " Lease Expiration Date:" + new Date(o.getExpiration()));
+
             } catch (Exception e) {
                 ptm.rollback(ts);
                 throw e;
@@ -75,6 +76,5 @@ public class CarThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return next;
     }
 }
