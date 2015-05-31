@@ -39,6 +39,7 @@ public class CarMover {
         query.setY(0);
         int roxelMaxY = spa.count(query);
 
+
         Roxel current = car.getRoxel();
         switch (car.getDirection()) {
             case EAST:
@@ -54,6 +55,7 @@ public class CarMover {
         }
         query.setOccupiedBy(new EmptyCar());
 
+
         Roxel next = null;
         try {
             PlatformTransactionManager ptm = new DistributedJiniTxManagerConfigurer().transactionManager();
@@ -61,7 +63,7 @@ public class CarMover {
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
                 next = spa.takeIfExists(query);
-                if (next == null) {
+                if (next == null || !(next.getDirection().equals(car.getDirection()))) {
                     System.out.println("Processor: next not found");
                     spa.write(car, car.getRoxelTimeInMs());
 
@@ -79,7 +81,7 @@ public class CarMover {
 
                 LeaseContext<CarImpl> o = spa.write(car, 100);
                 String UID = o.getUID();
-                System.out.println("Current Date:" + new Date(System.currentTimeMillis()) + " Lease Expiration Date:" + new Date(o.getExpiration()));
+            //    System.out.println("Current Date:" + new Date(System.currentTimeMillis()) + " Lease Expiration Date:" + new Date(o.getExpiration()));
 
 
             } catch (Exception e) {

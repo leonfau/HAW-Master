@@ -16,6 +16,7 @@ public class Roxel implements Serializable {
 	private Car occupiedBy;
 	private Direction direction;
 	private String id;
+	private Direction trafficLightDirection;
 
 	private Integer tileNR;
 
@@ -31,6 +32,7 @@ public class Roxel implements Serializable {
 		this.direction = direction;
 		this.tileNR = tileNR;
 		this.occupiedBy = new EmptyCar();
+		this.trafficLightDirection = direction;
 	}
 
 	@SpaceId(autoGenerate = true)
@@ -94,6 +96,15 @@ public class Roxel implements Serializable {
 		return direction;
 	}
 
+	public void setTrafficLightDirection(Direction trafficLightDirection) {
+		this.trafficLightDirection = trafficLightDirection;
+	}
+
+	@SpaceProperty
+	public Direction getTrafficLightDirection() {
+		return trafficLightDirection;
+	}
+
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
@@ -112,7 +123,6 @@ public class Roxel implements Serializable {
 		if (direction != roxel.direction) return false;
 		if (id != null ? !id.equals(roxel.id) : roxel.id != null) return false;
 		return !(tileNR != null ? !tileNR.equals(roxel.tileNR) : roxel.tileNR != null);
-
 	}
 
 	@Override

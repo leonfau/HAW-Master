@@ -41,7 +41,7 @@ public class Feeder implements InitializingBean, DisposableBean {
     private static final int X_SIZE = 20;
     private static final int Y_SIZE = 20;
     private static final int ROXEL_SIZE = 50;
-    private static final int CAR_AMOUNT = 30;
+    private static final int CAR_AMOUNT = 1;
 
 
     @GigaSpaceContext
