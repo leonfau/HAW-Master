@@ -1,6 +1,7 @@
 package TrafficCoordination.Visualization;
 
 import de.haw.trafficcoordination.common.Entities.CarImpl;
+import de.haw.trafficcoordination.common.Entities.Direction;
 import de.haw.trafficcoordination.common.Entities.Roxel;
 import org.newdawn.slick.*;
 import org.openspaces.core.GigaSpace;
@@ -71,6 +72,41 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
                 System.out.println("img null");
             }
         }
+
+        Roxel[] tdc = this.fetchTODECIDE();
+        for (int i = 0; i < tdc.length; i++) {
+            double size = tdc[i].getLength();
+            double xCoord = tdc[i].getX() * size;
+            double yCoord = tdc[i].getY() * size;
+            Image img = null;
+            switch (tdc[i].getDirection()) {
+                case BLOCKED:
+                    img = new Image("images/blocked.png");
+                    break;
+                case SOUTH:
+                    img = new Image("images/street.png");
+                    img.setRotation(90);
+                    break;
+                case EAST:
+                    img = new Image("images/street.png");
+                    break;
+                case TODECIDE:
+                    img = new Image("images/todecide.png");
+                    break;
+                default:
+                    break;
+            }
+
+            if (img != null) {
+                img.draw(new Float(xCoord), new Float(yCoord));
+            } else {
+                System.out.println("img null");
+            }
+        }
+
+
+
+
         System.out.println("Cars: " +  cars.length);
         for (int i = 0; i < cars.length; i++) {
             double size = cars[i].getLength();
@@ -117,6 +153,12 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     private Roxel[] fetchCars() {
         Roxel r = new Roxel();
         r.setOccupiedBy(new CarImpl());
+        return spa.readMultiple(r);
+    }
+
+    private Roxel[] fetchTODECIDE() {
+        Roxel r = new Roxel();
+        r.setTrafficLightDirection(Direction.TODECIDE);
         return spa.readMultiple(r);
     }
 
