@@ -63,27 +63,19 @@ public class CarMover {
             TransactionStatus ts = ptm.getTransaction(definition);
             try {
                 next = spa.takeIfExists(query);
-                if (next == null || !(next.getDirection().equals(car.getDirection()))) {
-                    System.out.println("Processor: next not found");
-                    spa.write(car, car.getRoxelTimeInMs());
-
-//                    throw new RoxelNotFoundException("roxel not found");
-                    return null;
+                if (next != null) {
+                    if (next.getDirection().equals(car.getDirection())) {
+                        car.setRoxel(next);
+                        next.setOccupiedBy(car);
+                        current.setOccupiedBy(new EmptyCar());
+                    }
+                    spa.write(next, net.jini.core.lease.Lease.FOREVER);
                 }
-                current.getOccupiedBy();
-                car.setRoxel(next);
-                next.setOccupiedBy(car);
-                current.setOccupiedBy(new EmptyCar());
-
-          //      System.out.println("Next Roxel: " + next.getX() + ":" + next.getY());
                 spa.write(current, net.jini.core.lease.Lease.FOREVER);
-                spa.write(next, net.jini.core.lease.Lease.FOREVER);
 
                 LeaseContext<CarImpl> o = spa.write(car, 100);
                 String UID = o.getUID();
-            //    System.out.println("Current Date:" + new Date(System.currentTimeMillis()) + " Lease Expiration Date:" + new Date(o.getExpiration()));
-
-
+                //    System.out.println("Current Date:" + new Date(System.currentTimeMillis()) + " Lease Expiration Date:" + new Date(o.getExpiration()));
             } catch (Exception e) {
                 ptm.rollback(ts);
                 throw e;

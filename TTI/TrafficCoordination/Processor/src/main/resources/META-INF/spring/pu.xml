@@ -68,7 +68,7 @@
     <bean id="trafficLight" class="de.haw.trafficcoordination.processor.TrafficLight" depends-on="gigaSpace"/>
 
     <os-events:notify-container id="trafficLightContainer" giga-space="gigaSpace">
-        <os-events:notify take="true"/>
+        <os-events:notify  write="true" update="false"/>
 
         <os-events:tx-support tx-manager="transactionManager"/>
         <os-core:sql-query where="trafficLightDirection = 'TODECIDE'" class="de.haw.trafficcoordination.common.Entities.Roxel"/>

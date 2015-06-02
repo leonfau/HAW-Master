@@ -47,7 +47,7 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
             double xCoord = map[i].getX() * size;
             double yCoord = map[i].getY() * size;
             Image img = null;
-            switch (map[i].getDirection()) {
+            switch (map[i].getTrafficLightDirection()) {
                 case BLOCKED:
                     img = new Image("images/blocked.png");
                     break;
@@ -71,6 +71,7 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
                 System.out.println("img null");
             }
         }
+        System.out.println("Cars: " +  cars.length);
         for (int i = 0; i < cars.length; i++) {
             double size = cars[i].getLength();
             double xCoord = cars[i].getX() * size;

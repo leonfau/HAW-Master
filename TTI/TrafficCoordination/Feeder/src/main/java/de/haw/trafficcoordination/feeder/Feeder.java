@@ -41,7 +41,7 @@ public class Feeder implements InitializingBean, DisposableBean {
     private static final int X_SIZE = 20;
     private static final int Y_SIZE = 20;
     private static final int ROXEL_SIZE = 50;
-    private static final int CAR_AMOUNT = 1;
+    private static final int CAR_AMOUNT = 30;
 
 
     @GigaSpaceContext
@@ -106,7 +106,7 @@ public class Feeder implements InitializingBean, DisposableBean {
             {
                 x = random.nextInt(X_SIZE);
             }
-            
+
             while (y % 3 != 0) {
                 y = random.nextInt(Y_SIZE);
             }
