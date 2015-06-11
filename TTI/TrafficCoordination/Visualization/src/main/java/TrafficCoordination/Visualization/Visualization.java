@@ -105,9 +105,6 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
         }
 
 
-
-
-        System.out.println("Cars: " +  cars.length);
         for (int i = 0; i < cars.length; i++) {
             double size = cars[i].getLength();
             double xCoord = cars[i].getX() * size;
@@ -131,7 +128,6 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     }
 
     public void render(GameContainer gc, Graphics g) throws SlickException {
-
         this.drawMap();
     }
 

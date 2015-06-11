@@ -11,8 +11,8 @@ import org.openspaces.events.notify.Notify;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import net.jini.core.lease.Lease;
 
-import java.rmi.dgc.Lease;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -69,9 +69,9 @@ public class CarMover {
                         next.setOccupiedBy(car);
                         current.setOccupiedBy(new EmptyCar());
                     }
-                    spa.write(next, net.jini.core.lease.Lease.FOREVER);
+                    spa.write(next, Lease.FOREVER);
                 }
-                spa.write(current, net.jini.core.lease.Lease.FOREVER);
+                spa.write(current, Lease.FOREVER);
 
                 LeaseContext<CarImpl> o = spa.write(car, 100);
                 String UID = o.getUID();
