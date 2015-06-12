@@ -26,7 +26,7 @@ public class CarMover {
 
     @SpaceDataEvent
     public void moveCarListener(CarImpl car) {
-        log.info(car.getId() + " + Event Received");
+      //  log.info(car.getId() + " + Event Received");
         this.takeNextRoxel(car);
     }
 

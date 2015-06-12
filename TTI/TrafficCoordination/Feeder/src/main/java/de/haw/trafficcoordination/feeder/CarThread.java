@@ -46,7 +46,7 @@ public class CarThread implements Runnable {
             try {
                 Roxel next = spa.take(query);
                 if (next == null) {
-                 //   spa.write(car, car.getRoxelTimeInMs());
+                    spa.write(car, car.getRoxelTimeInMs());
                     //     System.out.println("Init Roxel not found");
 //                    throw new RoxelNotFoundException("roxel x: " + query.getX() + " y: " + query.getY());
                     return;
