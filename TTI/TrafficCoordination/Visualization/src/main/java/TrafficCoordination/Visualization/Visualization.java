@@ -17,10 +17,11 @@ import org.springframework.beans.factory.InitializingBean;
 public class Visualization extends BasicGame implements InitializingBean, DisposableBean {
     @GigaSpaceContext(name = "gigaSpace")
     private GigaSpace spa;
+    private int nrOfPartitions = 1;
+    private GigaSpace[] partitions = new GigaSpace [nrOfPartitions];
 
     private Roxel[] map;
     private Roxel[] cars;
-    private Image[] basicImages;
 
     public Visualization() {
         super("Traffic Coordination");
@@ -31,10 +32,6 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     public void init(GameContainer gc) throws SlickException {
         map = this.fetchFullMap();
         cars = fetchCars();
-        basicImages = new Image[3];
-        basicImages[0] = new Image("images/street.png");
-        basicImages[1] = new Image("images/blocked.png");
-        basicImages[2] = new Image("images/todecide.png");
         System.out.println("Roxel: " + map.length);
 
     }
@@ -53,17 +50,17 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
             Image img = null;
             switch (map[i].getTrafficLightDirection()) {
                 case BLOCKED:
-                    img = basicImages[1].copy();
+                    img = new Image("images/blocked.png");
                     break;
                 case SOUTH:
-                    img =  basicImages[0].copy();
+                    img = new Image("images/street.png");
                     img.setRotation(90);
                     break;
                 case EAST:
-                    img =  basicImages[0].copy();
+                    img = new Image("images/street.png");
                     break;
                 case TODECIDE:
-                    img = basicImages[2].copy();
+                    img = new Image("images/todecide.png");
                     break;
                 default:
                     break;
@@ -84,17 +81,17 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
             Image img = null;
             switch (tdc[i].getDirection()) {
                 case BLOCKED:
-                    img = basicImages[1].copy();
+                    img = new Image("images/blocked.png");
                     break;
                 case SOUTH:
-                    img =  basicImages[0].copy();
+                    img = new Image("images/street.png");
                     img.setRotation(90);
                     break;
                 case EAST:
-                    img =  basicImages[0].copy();
+                    img = new Image("images/street.png");
                     break;
                 case TODECIDE:
-                    img = basicImages[2].copy();
+                    img = new Image("images/todecide.png");
                     break;
                 default:
                     break;
@@ -109,25 +106,23 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
 
 
         for (int i = 0; i < cars.length; i++) {
-            if (cars[i].getOccupiedBy() instanceof CarImpl) {
-                double size = cars[i].getLength();
-                double xCoord = cars[i].getX() * size;
-                double yCoord = cars[i].getY() * size;
-                Image img = null;
-                img = new Image("images/car-"
-                        + ((CarImpl) cars[i].getOccupiedBy()).getColor() + ".png");
-                switch (((CarImpl) cars[i].getOccupiedBy()).getDirection()) {
-                    case SOUTH:
-                        img.setRotation(90);
-                        break;
-                    default:
-                        break;
-                }
-                if (img != null) {
-                    img.draw(new Float(xCoord), new Float(yCoord));
-                } else {
-                    System.out.println("img null");
-                }
+            double size = cars[i].getLength();
+            double xCoord = cars[i].getX() * size;
+            double yCoord = cars[i].getY() * size;
+            Image img = null;
+            img = new Image("images/car-"
+                    + ((CarImpl) cars[i].getOccupiedBy()).getColor() + ".png");
+            switch (((CarImpl)cars[i].getOccupiedBy()).getDirection()) {
+                case SOUTH:
+                    img.setRotation(90);
+                    break;
+                default:
+                    break;
+            }
+            if (img != null) {
+                img.draw(new Float(xCoord), new Float(yCoord));
+            } else {
+                System.out.println("img null");
             }
         }
     }
@@ -164,6 +159,12 @@ public class Visualization extends BasicGame implements InitializingBean, Dispos
     }
 
     private void initSpace(String url){
+
+        partitions = new GigaSpace [nrOfPartitions];
+        for (int i = 0; i < nrOfPartitions; i++) {
+            UrlSpaceConfigurer spaceConfigurer = new UrlSpaceConfigurer("/./space"+ "?cluster_schema=partitioned-sync2backup&id="+(i+1)+"&total_members="+nrOfPartitions + ",0");
+            partitions[i] = new GigaSpaceConfigurer(spaceConfigurer.space()).gigaSpace();
+        }
 
         UrlSpaceConfigurer spaceConfigurer = new UrlSpaceConfigurer(url);
         this.spa = new GigaSpaceConfigurer(spaceConfigurer).gigaSpace();
