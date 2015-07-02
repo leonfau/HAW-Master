@@ -3,7 +3,6 @@ package de.haw.trafficcoordination.processor;
 import de.haw.trafficcoordination.common.Entities.Direction;
 import de.haw.trafficcoordination.common.Entities.Roxel;
 import de.haw.trafficcoordination.common.Entities.CarImpl;
-import net.jini.core.lease.Lease;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.context.GigaSpaceContext;
 import org.openspaces.events.EventDriven;
@@ -20,74 +19,35 @@ public class TrafficLight {
     @GigaSpaceContext
     private GigaSpace spa;
 
-
+    private static final int RANGE = 5;
     boolean dir = false;
 
     @SpaceDataEvent
     public void trafficLightListener(Roxel r) {
-    /*    log.info("Traffic Light Event Received");
+        log.info("Traffic Light Event Received");
 
-
-        Roxel rEast = new Roxel();
-        rEast.setOccupiedBy(new CarImpl());
-        rEast.setDirection(Direction.EAST);
-
-        int carsEast = spa.count(rEast);
-
-        Roxel rSouth = new Roxel();
-        rSouth.setOccupiedBy(new CarImpl());
-        rSouth.setDirection(Direction.SOUTH);
-        rSouth.setY(r.getY());
-
-        int carsSouth = spa.count(rSouth);
-        /*
-        int carsEast = spa.readMultiple(
-                new SQLQuery<Roxel>(Roxel.class, "occupiedBy = ? AND direction = ? AND x < ?").setParameter(1, new CarImpl()).setParameter(2, Direction.EAST).setParameter(3, r.getX())).length;
-        int carsSouth = spa.readMultiple(
-                new SQLQuery<Roxel>(Roxel.class, "occupiedBy = ? AND direction = ? AND y < ?").setParameter(1, new CarImpl()).setParameter(2, Direction.SOUTH).setParameter(3, r.getY())).length;
-        */
-        int carsWest = 0;
-        int carsNorth = 0;
+        //North
+        SQLQuery<Roxel> query = new SQLQuery<Roxel>(Roxel.class, "x = ? AND y <= ? AND y >= ? AND direction = ? AND occupiedBy = ?");
+        int x = r.getX();
+        int y = r.getY();
+        query.setParameter(1, x);
+        query.setParameter(2, y-1 < 0 ? 0 : y-1);
+        query.setParameter(3, y-1-RANGE < 0 ? 0 : y-1-RANGE);
+        query.setParameter(4, Direction.SOUTH);
+        query.setParameter(5, new CarImpl());
+        int carsNorth = spa.count(query);
 
         //West
+        query = new SQLQuery<Roxel>(Roxel.class, "y = ? AND x <= ? AND x >= ? AND direction = ? AND occupiedBy = ?");
+        x = r.getX();
+        y = r.getY();
+        query.setParameter(1, y);
+        query.setParameter(2, x-1 < 0 ? 0 : x-1);
+        query.setParameter(3, x-1-RANGE < 0 ? 0 : x-1-RANGE);
+        query.setParameter(4, Direction.EAST);
+        query.setParameter(5, new CarImpl());
+        int carsWest = spa.count(query);
 
-        Roxel query = new Roxel();
-        query.setX(r.getX());
-
-        int xSize = spa.count(query);
-        int nextX = query.getX() - 1 < xSize ? xSize - query.getX() : query.getX() - 1;
-
-        query.setX(nextX);
-        query.setY(r.getY());
-
-        Roxel res = spa.read(query);
-        while (res != null && !res.getTrafficLightDirection().equals(Direction.TODECIDE)) {
-            if (res.getOccupiedBy() instanceof CarImpl) {
-                carsWest++;
-            }
-            nextX = query.getX() - 1 < xSize ? xSize - query.getX() : query.getX() - 1;
-            query.setX(nextX);
-            res = spa.read(query);
-        }
-
-
-        query = new Roxel();
-        query.setY(r.getY());
-        int ySize = spa.count(query);
-        query.setX(r.getX());
-        int nextY = query.getY() - 1 < ySize ? ySize - query.getY() : query.getY() - 1;
-
-        query.setY(nextY);
-
-        res = spa.read(query);
-        while (res != null && !res.getTrafficLightDirection().equals(Direction.TODECIDE)) {
-            if (res.getOccupiedBy() instanceof CarImpl) {
-                carsNorth++;
-            }
-            nextY = query.getY() - 1 < ySize ? ySize - query.getY() : query.getY() - 1;
-            query.setY(nextY);
-            res = spa.read(query);
-        }
 
         if (carsWest > carsNorth) {
             r.setDirection(Direction.EAST);
@@ -101,6 +61,5 @@ public class TrafficLight {
             }
         }
         spa.write(r);
-
     }
 }
